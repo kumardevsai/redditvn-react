@@ -4,6 +4,13 @@ import $ from 'jquery';
 import { connect } from 'react-redux';
 import Mark from 'mark.js'
 
+// break line and add br tag
+const regexBreakLine = /(?:\r\n|\r|\n)/g
+// auto generate a tag for link
+const regexAutoLink = /(?![^<]*>|[^<>]*<\/)((https?:)\/\/[a-z0-9&#=./\-?_]+)/gi;
+// not highlight reddit link when it inside a tag
+const regexAutoRedditLink = /(?!<a[^>]*?>)([ru]\/[a-z0-9\-_]+)(?![^<]*?<\/a>)/gi
+
 class PostContent extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (deepEqual(this.props, nextProps) === false) {
@@ -23,15 +30,18 @@ class PostContent extends Component {
   updateContent = () => {
     const postContainer = $(this.refs.blogPostContainer);
     postContainer.empty();
+
     let content = this.props.content || '';
-    content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
-    const result = content.replace(/([ru]\/[a-z0-9\-_]+)/gi, function(match, p1, offset, string) {
+    content = content.replace(regexBreakLine, '<br />');
+    content = content.replace(regexAutoLink, '<a href="$1">$1</a>');
+
+    content = content.replace(regexAutoRedditLink, function(match, p1, offset, string) {
       const className = p1[0].toLowerCase() === 'r' ? 'redditvn-sub' : 'redditvn-user';
       return '<a class="' + className + '" href="https://reddit.com/' + p1 + '" target="_blank">' + p1 + '</a>';
     });
 
     const newnode = $('<div>', {
-      html: result
+      html: content
     });
 
     postContainer.append(newnode);
