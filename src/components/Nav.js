@@ -19,7 +19,7 @@ class Nav extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
-    this.props.push(`/search?q=${this.state.query}`);
+    this.props.push(`/search?q=${encodeURIComponent(this.state.query)}`);
   };
 
   componentWillReceiveProps(nextProps) {
