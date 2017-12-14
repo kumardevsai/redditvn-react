@@ -9,7 +9,7 @@ import PostContainer from '../components/Post/PostContainer';
 import { Link } from 'react-router-dom';
 import { operations } from '../duck';
 import LazyImage from '../components/LazyImage';
-import Error from '../components/Error'
+import ErrorMessage from '../components/ErrorMessage'
 
 class User extends Component {
   componentWillReceiveProps(nextProps) {}
@@ -43,7 +43,7 @@ class User extends Component {
 
   render() {
     if (this.props.error) {
-      return <Error error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />
     }
 
     if (!this.props.userPosts.docs) {

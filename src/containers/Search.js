@@ -7,7 +7,7 @@ import querystring from 'querystring';
 import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import PostContainer from '../components/Post/PostContainer';
-import Error from '../components/Error'
+import ErrorMessage from '../components/ErrorMessage'
 
 class Search extends Component {
   componentWillReceiveProps(nextProps) {
@@ -42,7 +42,7 @@ class Search extends Component {
 
   render() {
     if (this.props.error) {
-      return <Error error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />
     }
 
     if (!this.props.posts.docs) {

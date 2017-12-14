@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { operations } from '../duck';
-import Error from '../components/Error'
+import ErrorMessage from '../components/ErrorMessage'
 
 class Home extends Component {
   constructor(props) {
@@ -32,7 +32,7 @@ class Home extends Component {
 
   render() {
     if (this.props.error) {
-      return <Error error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />
     }
 
     return (

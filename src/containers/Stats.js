@@ -4,13 +4,13 @@ import { withRouter } from 'react-router-dom';
 import Statistics from '../components/Stats/Statistics';
 import Top from '../components/Stats/Top';
 import User from '../components/Stats/User';
-import Error from '../components/Error'
+import ErrorMessage from '../components/ErrorMessage'
 import { connect } from 'react-redux';
 
 class Stats extends Component {
   render() {
     if (this.props.error) {
-      return <Error error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />
     }
 
     return (

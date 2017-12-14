@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PostContainer from '../components/Post/PostContainer';
 import { connect } from 'react-redux';
 import { operations } from '../duck';
-import Error from '../components/Error'
+import ErrorMessage from '../components/ErrorMessage'
 
 class Post extends Component {
   componentWillReceiveProps(nextProps) {
@@ -17,7 +17,7 @@ class Post extends Component {
 
   render() {
     if (this.props.error) {
-      return <Error error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />
     }
 
     return <PostContainer postId={this.props.postId} post={this.props.detail} images={this.props.images} comments={this.props.comments} showDetail={true} />;
