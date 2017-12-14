@@ -31,8 +31,10 @@ class Home extends Component {
   }
 
   render() {
-    if (this.props.error) {
-      return <ErrorMessage error={this.props.error} />;
+    const { error, stats_count } = this.props;
+
+    if (error) {
+      return <ErrorMessage error={error} />;
     }
 
     return (
@@ -59,8 +61,8 @@ class Home extends Component {
         </form>
         <p className="lead pt-5">
           Chuyên trang tìm kiếm bài viết Reddit Vietnam
-          <br /> Cảm ơn <code>{this.props.info.memberCount}</code> thành viên đã đóng góp <code>{this.props.info.postCount}</code> bài viết và{' '}
-          <code>{this.props.info.commentCount}</code> bình luận.
+          <br /> Cảm ơn <code>{stats_count.member_count}</code> thành viên đã đóng góp <code>{stats_count.post_count}</code> bài viết và{' '}
+          <code>{stats_count.comment_count}</code> bình luận.
         </p>
       </div>
     );
@@ -68,7 +70,7 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  info: state.home.info,
+  stats_count: state.home.stats_count,
   error: state.home.error
 });
 

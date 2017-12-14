@@ -64,6 +64,8 @@ class Top extends Component {
   };
 
   render() {
+    const { top } = this.props;
+
     return (
       <div>
         <form className="mb-3" onSubmit={this.onSubmitForm}>
@@ -95,8 +97,8 @@ class Top extends Component {
                 <Link to="/stats/user">Top posters</Link>
               </h5>
               <ul className="list-group list-group-flush">
-                {this.props.top.topUsers &&
-                  this.props.top.topUsers.map(value => (
+                {top.top_users &&
+                  top.top_users.map(value => (
                     <li className="list-group-item d-flex justify-content-between align-items-center" key={value._id}>
                       <div>
                         <Link to={`/user/${value._id}`} className="d-inline-block mr-2">
@@ -122,8 +124,8 @@ class Top extends Component {
             <div className="card">
               <h5 className="card-header">Most liked posts</h5>
               <ul className="list-group list-group-flush">
-                {this.props.top.topLikes &&
-                  this.props.top.topLikes.map(value => (
+                {top.top_likes &&
+                  top.top_likes.map(value => (
                     <li className="list-group-item d-flex justify-content-between align-items-center" key={value._id}>
                       <div>
                         <Link to={`/user/${value.from.id}`} className="d-inline-block mr-2">
@@ -149,8 +151,8 @@ class Top extends Component {
             <div className="card">
               <h5 className="card-header">Most commented posts</h5>
               <ul className="list-group list-group-flush">
-                {this.props.top.topComments &&
-                  this.props.top.topComments.map(value => (
+                {top.top_comments &&
+                  top.top_comments.map(value => (
                     <li className="list-group-item d-flex justify-content-between align-items-center" key={value._id}>
                       <div>
                         <Link to={`/user/${value.from.id}`} className="d-inline-block mr-2">

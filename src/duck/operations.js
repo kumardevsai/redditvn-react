@@ -14,14 +14,14 @@ export const hideLoading = () => {
 
 // home
 export const fetchInfo = () => (dispatch, getState) => {
-  const { postCount } = getState().home.info;
-  if (postCount !== 0) {
+  const { post_count } = getState().home.stats_count;
+  if (post_count !== 0) {
     return;
   }
 
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/info`)
+    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/stats/count`)
     .then(response => {
       dispatch(actions.home__ReceiveInfo(response.data));
       dispatch(actions.main__HideLoading());
@@ -164,7 +164,7 @@ export const fetchUserList = (page, limit) => (dispatch, getState) => {
 export const fetchStatistics = (type, group) => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/stats/?type=${type}&group=${group}`)
+    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/stats/chart/?type=${type}&group=${group}`)
     .then(response => {
       dispatch(actions.stats_statistic__ReceiveChart(response.data));
       dispatch(actions.main__HideLoading());

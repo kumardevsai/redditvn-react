@@ -26,10 +26,10 @@ export const mainReducer = (state = mainInitialState, action) => {
 
 // home
 const homeInitialState = {
-  info: {
-    postCount: 0,
-    memberCount: 0,
-    commentCount: 0
+  stats_count: {
+    post_count: 0,
+    member_count: 0,
+    comment_count: 0
   },
   error: undefined
 };
@@ -38,7 +38,7 @@ export const homeReducer = (state = homeInitialState, action) => {
     case types.HOME__RECEIVE_INFO:
       return {
         ...state,
-        info: action.info,
+        stats_count: action.stats_count,
         error: undefined
       };
 

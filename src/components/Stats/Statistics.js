@@ -71,18 +71,18 @@ class Statistics extends Component {
     const { chart } = this.props;
 
     console.log(chart);
-    if (!chart || !chart.stats) {
+    if (!chart || !chart.chart_data) {
       return;
     }
 
     const chartConfig = {
       type: 'line',
       data: {
-        labels: chart.stats.label,
+        labels: chart.chart_data.label,
         datasets: [
           {
             label: chart.group,
-            data: chart.stats.data,
+            data: chart.chart_data.data,
             fill: false
           }
         ]

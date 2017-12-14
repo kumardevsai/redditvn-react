@@ -10,9 +10,9 @@ export const main__HideLoading = () => ({
 });
 
 // home
-export const home__ReceiveInfo = info => ({
+export const home__ReceiveInfo = stats_count => ({
   type: types.HOME__RECEIVE_INFO,
-  info: info
+  stats_count: stats_count
 });
 
 export const home__Error = error => ({
