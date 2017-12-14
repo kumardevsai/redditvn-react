@@ -68,18 +68,21 @@ class Statistics extends Component {
   };
 
   updateChart = () => {
-    if (!this.props.chart || !this.props.chart.dbStats) {
+    const { chart } = this.props;
+
+    console.log(chart);
+    if (!chart || !chart.stats) {
       return;
     }
 
     const chartConfig = {
       type: 'line',
       data: {
-        labels: this.props.chart.dbStats.labels,
+        labels: chart.stats.label,
         datasets: [
           {
-            label: this.props.chart.dbStats.xLabel,
-            data: this.props.chart.dbStats.data,
+            label: chart.group,
+            data: chart.stats.data,
             fill: false
           }
         ]
@@ -87,8 +90,8 @@ class Statistics extends Component {
       options: {
         responsive: true,
         title: {
-          display: true,
-          text: this.props.chart.dbStats.title
+          display: false,
+          text: '...'
         },
         tooltips: {
           mode: 'index',
@@ -104,7 +107,7 @@ class Statistics extends Component {
               display: true,
               scaleLabel: {
                 display: true,
-                labelString: this.props.chart.dbStats.xLabel
+                labelString: chart.group
               }
             }
           ],
@@ -113,7 +116,7 @@ class Statistics extends Component {
               display: true,
               scaleLabel: {
                 display: true,
-                labelString: this.props.chart.dbStats.yLabel
+                labelString: chart.type
               }
             }
           ]
@@ -157,9 +160,8 @@ class Statistics extends Component {
           </button>
         </form>
         <div className="card">
-          <h5 className="card-header">Posts per Month</h5>
+          <h5 className="card-header">Statistics</h5>
           <div id="chart" ref="chart" />
-          {/* <canvas id="canvas" ref="canvas" /> */}
         </div>
       </div>
     );

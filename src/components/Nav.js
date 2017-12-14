@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { push } from 'react-router-redux';
-import $ from 'jquery';
 
 class Nav extends Component {
   constructor(props) {
@@ -26,16 +25,6 @@ class Nav extends Component {
     if (this.props.query !== nextProps.query) {
       this.setState({ query: nextProps.query });
     }
-  }
-
-  componentDidMount() {
-    $('.navbar').on('mouseenter mouseleave', '.dropdown', function(e) {
-      var _d = $(e.target).closest('.dropdown');
-      _d.addClass('show');
-      setTimeout(function() {
-        _d[_d.is(':hover') ? 'addClass' : 'removeClass']('show');
-      }, 300);
-    });
   }
 
   render() {
