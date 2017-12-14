@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import LazyImage from '../LazyImage';
 import url from 'url';
 import deepEqual from 'deep-equal';
-import { push } from 'react-router-redux'
+import { push } from 'react-router-redux';
 
 class Top extends Component {
   constructor(props) {
@@ -61,7 +61,7 @@ class Top extends Component {
 
   fetchTopStats = () => {
     this.props.fetchTop(this.props.limit, this.props.group);
-  }
+  };
 
   render() {
     return (
@@ -86,7 +86,7 @@ class Top extends Component {
           </div>
           <button className="btn btn-primary" type="submit">
             Show
-      </button>
+          </button>
         </form>
         <div className="row">
           <div className="col-lg-4 col-md-6 mb-3">

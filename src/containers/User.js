@@ -9,7 +9,7 @@ import PostContainer from '../components/Post/PostContainer';
 import { Link } from 'react-router-dom';
 import { operations } from '../duck';
 import LazyImage from '../components/LazyImage';
-import ErrorMessage from '../components/ErrorMessage'
+import ErrorMessage from '../components/ErrorMessage';
 
 class User extends Component {
   componentWillReceiveProps(nextProps) {}
@@ -43,7 +43,7 @@ class User extends Component {
 
   render() {
     if (this.props.error) {
-      return <ErrorMessage error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />;
     }
 
     if (!this.props.userPosts.docs) {
@@ -52,11 +52,12 @@ class User extends Component {
 
     const currentPage = parseInt(this.props.userPosts.page - 1, 10);
 
-    const pagnite = this.props.userPosts.docs.length > 0 ? (
-      <div className="nav justify-content-end">
-        <CustomPaginate currentPage={currentPage} totalPage={this.props.userPosts.pages} onPageChange={this.onPageChange} />
-      </div>
-    ) : null;
+    const pagnite =
+      this.props.userPosts.docs.length > 0 ? (
+        <div className="nav justify-content-end">
+          <CustomPaginate currentPage={currentPage} totalPage={this.props.userPosts.pages} onPageChange={this.onPageChange} />
+        </div>
+      ) : null;
 
     return (
       <div>

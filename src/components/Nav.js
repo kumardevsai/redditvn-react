@@ -29,9 +29,10 @@ class Nav extends Component {
   }
 
   componentDidMount() {
-    $('.navbar').on('mouseenter mouseleave', '.dropdown', function (e) {
-      var _d = $(e.target).closest('.dropdown'); _d.addClass('show');
-      setTimeout(function () {
+    $('.navbar').on('mouseenter mouseleave', '.dropdown', function(e) {
+      var _d = $(e.target).closest('.dropdown');
+      _d.addClass('show');
+      setTimeout(function() {
         _d[_d.is(':hover') ? 'addClass' : 'removeClass']('show');
       }, 300);
     });
@@ -105,12 +106,22 @@ class Nav extends Component {
               </div>
             </li>
           </ul>
-          {showSearchBar && (<form className="form-inline my-lg-0" onSubmit={this.onSubmitForm} target="_top">
-            <input className="form-control mr-sm-2" name="q" type="text"
-              onChange={this.onQueryChange}
-              placeholder="Search (regex support)" aria-label="Search (regex support)" value={this.state.query} />
-            <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
-          </form>)}
+          {showSearchBar && (
+            <form className="form-inline my-lg-0" onSubmit={this.onSubmitForm} target="_top">
+              <input
+                className="form-control mr-sm-2"
+                name="q"
+                type="text"
+                onChange={this.onQueryChange}
+                placeholder="Search (regex support)"
+                aria-label="Search (regex support)"
+                value={this.state.query}
+              />
+              <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">
+                Search
+              </button>
+            </form>
+          )}
         </div>
       </nav>
     );
@@ -122,6 +133,8 @@ const mapStateToProps = (state, ownProps) => ({
   query: state.search.query
 });
 
-export default withRouter(connect(mapStateToProps, {
-  push
-})(Nav));
+export default withRouter(
+  connect(mapStateToProps, {
+    push
+  })(Nav)
+);

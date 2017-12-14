@@ -1,4 +1,4 @@
-import * as types from './types'
+import * as types from './types';
 
 // main
 export const main__ShowLoading = () => ({
@@ -18,13 +18,13 @@ export const home__ReceiveInfo = info => ({
 export const home__Error = error => ({
   type: types.HOME__ERROR,
   error
-})
+});
 
 // post
 export const post__Error = error => ({
   type: types.POST__ERROR,
   error
-})
+});
 
 export const post__CleanPost = () => ({
   type: types.POST__CLEAN_POST
@@ -33,6 +33,10 @@ export const post__CleanPost = () => ({
 export const post__ReceivePost = post => ({
   type: types.POST__RECEIVE_POST,
   detail: post
+});
+
+export const post__RequestComment = () => ({
+  type: types.POST__REQUEST_COMMENTS
 });
 
 export const post__ReceiveComment = comments => ({
@@ -49,14 +53,14 @@ export const post__ReceiveImages = images => ({
 export const search__Error = error => ({
   type: types.SEARCH__ERROR,
   error
-})
+});
 
-export const search__SetQuery = (query) => ({
+export const search__SetQuery = query => ({
   type: types.SEARCH__SET_QUERY,
   query: query
-})
+});
 
-export const search__ReceivePosts = (posts) => ({
+export const search__ReceivePosts = posts => ({
   type: types.SEARCH__RECEIVE_POSTS,
   posts: posts
 });
@@ -65,14 +69,14 @@ export const search__ReceivePosts = (posts) => ({
 export const user__Error = error => ({
   type: types.USER__ERROR,
   error
-})
+});
 
-export const user__ReceiveInfo = (info) => ({
+export const user__ReceiveInfo = info => ({
   type: types.USER__RECEIVE_INFO,
   info: info
 });
 
-export const user__ReceivePosts = (posts) => ({
+export const user__ReceivePosts = posts => ({
   type: types.USER__RECEIVE_POSTS,
   posts: posts
 });
@@ -81,22 +85,19 @@ export const user__ReceivePosts = (posts) => ({
 export const stats__Error = error => ({
   type: types.STATS__ERROR,
   error
-})
+});
 
-export const stats_statistic__ReceiveChart = (chart) => ({
+export const stats_statistic__ReceiveChart = chart => ({
   type: types.STATS_STATISTICS__RECEIVE_CHART,
   chart: chart
-})
+});
 
-export const stats_top__ReceiveList = (top) => ({
+export const stats_top__ReceiveList = top => ({
   type: types.STATS_TOP__RECEIVE_LIST,
   top: top
-})
+});
 
-export const stats_user__ReceiveUsers = (users) => ({
+export const stats_user__ReceiveUsers = users => ({
   type: types.STATS_USER__RECEIVE_USERS,
   users: users
-})
-
-
-
+});

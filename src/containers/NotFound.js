@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ErrorMessage from '../components/ErrorMessage'
+import ErrorMessage from '../components/ErrorMessage';
 
 class NotFound extends Component {
   render() {
@@ -7,9 +7,7 @@ class NotFound extends Component {
     error.status = 404;
     error.title = 'page not found';
     error.message = 'the page you requested does not exist';
-    return (
-      <ErrorMessage error={error}/>
-    )
+    return <ErrorMessage error={error} />;
   }
 }
 

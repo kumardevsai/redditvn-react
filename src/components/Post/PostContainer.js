@@ -8,8 +8,21 @@ import PostInfo from './PostInfo';
 import PostNavigation from './PostNavigation';
 import PostComment from './PostComment';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 class PostContainer extends PureComponent {
+  static propTypes = {
+    post: PropTypes.object.isRequired,
+    images: PropTypes.array,
+    comments: PropTypes.array
+  };
+
+  static defaultProps = {
+    post: {},
+    images: undefined,
+    comments: undefined
+  };
+
   render() {
     const { post, images, comments } = this.props;
     const showDetail = this.props.showDetail === true;

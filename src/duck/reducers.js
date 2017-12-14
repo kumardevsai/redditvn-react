@@ -3,20 +3,20 @@ import * as types from './types';
 
 // main
 const mainInitialState = {
-  is_loading: false
+  isLoading: false
 };
 export const mainReducer = (state = mainInitialState, action) => {
   switch (action.type) {
     case types.MAIN__HIDE_LOADING:
       return {
         ...state,
-        is_loading: false
+        isLoading: false
       };
 
     case types.MAIN__SHOW_LOADING:
       return {
         ...state,
-        is_loading: true
+        isLoading: true
       };
 
     default:
@@ -58,7 +58,8 @@ const postInitialState = {
   detail: {},
   images: [],
   comments: [],
-  error: undefined
+  error: undefined,
+  isLoadingComment: false
 };
 export const postReducer = (state = postInitialState, action) => {
   switch (action.type) {
@@ -78,7 +79,8 @@ export const postReducer = (state = postInitialState, action) => {
     case types.POST__RECEIVE_COMMENTS:
       return {
         ...state,
-        comments: action.comments
+        comments: action.comments,
+        isLoadingComment: false
       };
 
     case types.POST__CLEAN_POST:
@@ -87,7 +89,14 @@ export const postReducer = (state = postInitialState, action) => {
         detail: postInitialState.detail,
         images: postInitialState.images,
         comments: postInitialState.comments,
-        error: undefined
+        error: undefined,
+        isLoadingComment: false
+      };
+
+    case types.POST__REQUEST_COMMENTS:
+      return {
+        ...state,
+        isLoadingComment: true
       };
 
     case types.POST__ERROR:
@@ -138,7 +147,7 @@ const userInitialState = {
   info: {},
   posts: [],
   error: undefined
-}
+};
 export const userReducer = (state = userInitialState, action) => {
   switch (action.type) {
     case types.USER__RECEIVE_INFO:
@@ -171,7 +180,7 @@ const statsInitialState = {
   top: {},
   users: [],
   error: undefined
-}
+};
 export const statsReducer = (state = statsInitialState, action) => {
   switch (action.type) {
     case types.STATS_STATISTICS__RECEIVE_CHART:
@@ -204,14 +213,14 @@ export const statsReducer = (state = statsInitialState, action) => {
     default:
       return state;
   }
-}
+};
 
 //combineReducers
-export default ({
+export default {
   main: mainReducer,
   home: homeReducer,
   post: postReducer,
   search: searchReducer,
   user: userReducer,
   stats: statsReducer
-});
+};

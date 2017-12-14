@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { operations } from '../../duck';
 import { connect } from 'react-redux';
 import deepEqual from 'deep-equal';
-import PostCommentDetail from './PostCommentDetail'
+import PostCommentDetail from './PostCommentDetail';
+import PropTypes from 'prop-types';
 
 class PostComment extends Component {
   constructor(props) {
@@ -11,6 +12,18 @@ class PostComment extends Component {
       show_comment: false
     };
   }
+
+  static propTypes = {
+    postId: PropTypes.string.isRequired,
+    opId: PropTypes.string.isRequired,
+    comments: PropTypes.array.isRequired
+  };
+
+  static defaultProps = {
+    postId: '0',
+    opId: '0',
+    comments: []
+  };
 
   componentWillReceiveProps(nextProps) {
     if (this.props.postId !== nextProps.postId) {
@@ -39,6 +52,17 @@ class PostComment extends Component {
           <button type="button" className="btn btn-primary" onClick={this.onClickShowComments}>
             Show comments
           </button>
+        ) : this.props.isLoadingComment ? (
+          <div className="progress">
+            <div
+              className="progress-bar progress-bar-striped progress-bar-animated"
+              role="progressbar"
+              aria-valuenow="100"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              style={{ width: '100%' }}
+            />
+          </div>
         ) : (
           <PostCommentDetail opId={opId} comments={comments} />
         )}
@@ -47,7 +71,9 @@ class PostComment extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({});
+const mapStateToProps = (state, ownProps) => ({
+  isLoadingComment: state.post.isLoadingComment
+});
 
 export default connect(mapStateToProps, {
   fetchCommentByPostId: operations.fetchCommentByPostId

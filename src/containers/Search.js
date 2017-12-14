@@ -7,11 +7,10 @@ import querystring from 'querystring';
 import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import PostContainer from '../components/Post/PostContainer';
-import ErrorMessage from '../components/ErrorMessage'
+import ErrorMessage from '../components/ErrorMessage';
 
 class Search extends Component {
-  componentWillReceiveProps(nextProps) {
-  }
+  componentWillReceiveProps(nextProps) {}
 
   shouldComponentUpdate(nextProps, nextState) {
     if (deepEqual(this.props, nextProps) === true) {
@@ -42,20 +41,21 @@ class Search extends Component {
 
   render() {
     if (this.props.error) {
-      return <ErrorMessage error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />;
     }
 
     if (!this.props.posts.docs) {
       return null;
     }
 
-    const curPage = parseInt(this.props.posts.page - 1, 10)
+    const curPage = parseInt(this.props.posts.page - 1, 10);
 
-    const pagnite = this.props.posts.docs.length > 0 ? (
-      <div className="nav justify-content-end">
-        <CustomPaginate currentPage={curPage} totalPage={this.props.posts.pages} onPageChange={this.onPageChange}/>
-      </div>
-    ) : null;
+    const pagnite =
+      this.props.posts.docs.length > 0 ? (
+        <div className="nav justify-content-end">
+          <CustomPaginate currentPage={curPage} totalPage={this.props.posts.pages} onPageChange={this.onPageChange} />
+        </div>
+      ) : null;
 
     return (
       <div>

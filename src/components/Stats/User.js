@@ -38,7 +38,7 @@ class User extends Component {
 
   render() {
     const currentPage = parseInt(this.props.users.page - 1, 10);
-    const beginCount = (currentPage) * this.props.users.limit + 1;
+    const beginCount = currentPage * this.props.users.limit + 1;
 
     const pagnite = (
       <div className="nav justify-content-end">
@@ -51,47 +51,48 @@ class User extends Component {
         {pagnite}
 
         <div className="card mb-3">
-        <h5 className="card-header">The ranking of {this.props.users.total} RedditVN members</h5>
-        <table className="table table-hover table-bordered">
-          <thead>
-            <tr>
-              <th className="text-center" scope="col">
-                #
-              </th>
-              <th scope="col">Name</th>
-              <th className="text-center" scope="col">
-                Posts
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.users.docs && this.props.users.docs.map((value, index) => (
-              <tr key={value._id}>
-                <th className="text-center" scope="row">
-                  {beginCount + index}
+          <h5 className="card-header">The ranking of {this.props.users.total} RedditVN members</h5>
+          <table className="table table-hover table-bordered">
+            <thead>
+              <tr>
+                <th className="text-center" scope="col">
+                  #
                 </th>
-                <td>
-                  <Link to={`/user/${value._id}`} className="d-inline-block mr-2">
-                    <LazyImage
-                      className="rounded-circle fb-avatar"
-                      src={`https://graph.facebook.com/${value._id}/picture?width=32`}
-                      alt={value.name}
-                      height="2rem"
-                      width="2rem"
-                    />
-                  </Link>
-                  <a href={`https://www.facebook.com/${value._id}`}>{value.name}</a>
-                </td>
-                <td className="text-center">
-                  <Link to={`/user/${value._id}`}>{value.post_count}</Link>
-                </td>
+                <th scope="col">Name</th>
+                <th className="text-center" scope="col">
+                  Posts
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {this.props.users.docs &&
+                this.props.users.docs.map((value, index) => (
+                  <tr key={value._id}>
+                    <th className="text-center" scope="row">
+                      {beginCount + index}
+                    </th>
+                    <td>
+                      <Link to={`/user/${value._id}`} className="d-inline-block mr-2">
+                        <LazyImage
+                          className="rounded-circle fb-avatar"
+                          src={`https://graph.facebook.com/${value._id}/picture?width=32`}
+                          alt={value.name}
+                          height="2rem"
+                          width="2rem"
+                        />
+                      </Link>
+                      <a href={`https://www.facebook.com/${value._id}`}>{value.name}</a>
+                    </td>
+                    <td className="text-center">
+                      <Link to={`/user/${value._id}`}>{value.post_count}</Link>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
 
-      {pagnite}
+        {pagnite}
       </div>
     );
   }

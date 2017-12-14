@@ -8,7 +8,9 @@ class Footer extends Component {
         <div className="container-fluid p-3 p-md-5">
           <ul className="bd-footer-links">
             <li>
-              <NavLink exact to="/search">News</NavLink>
+              <NavLink exact to="/search">
+                News
+              </NavLink>
             </li>
             <li>
               <a href="https://www.facebook.com/366378530426222_448018485595559" target="_blank" rel="noopener noreferrer">

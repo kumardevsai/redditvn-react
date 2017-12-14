@@ -30,8 +30,16 @@ class LazyImage extends Component {
       width: this.props.width
     };
     return (
-      <LazyLoad height={this.props.height} placeholder={<div style={sizeStyle}/>} offset={100}>
-        <img style={sizeStyle} onError={this.onErrorImage} onLoad={this.onLoadedImage} className={this.props.className} src={this.state.src} alt={this.state.alt} title={this.state.alt} />
+      <LazyLoad height={this.props.height} placeholder={<div style={sizeStyle} />} offset={100}>
+        <img
+          style={sizeStyle}
+          onError={this.onErrorImage}
+          onLoad={this.onLoadedImage}
+          className={this.props.className}
+          src={this.state.src}
+          alt={this.state.alt}
+          title={this.state.alt}
+        />
       </LazyLoad>
     );
   }

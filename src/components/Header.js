@@ -4,9 +4,7 @@ import { withRouter } from 'react-router-dom';
 
 class Header extends Component {
   render() {
-    return (
-      <Nav />
-    );
+    return <Nav />;
   }
 }
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Chart from 'chart.js';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { push } from 'react-router-redux'
+import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import { operations } from '../../duck';
 import url from 'url';
@@ -65,7 +65,7 @@ class Statistics extends Component {
 
   fetchNewStatistics = () => {
     this.props.fetchStatistics(this.props.type, this.props.group);
-  }
+  };
 
   updateChart = () => {
     if (!this.props.chart || !this.props.chart.dbStats) {
@@ -127,10 +127,10 @@ class Statistics extends Component {
     }
 
     const node = document.createElement('canvas');
-    node.id = 'canvas'
-    chartContainer.appendChild(node)
+    node.id = 'canvas';
+    chartContainer.appendChild(node);
     new Chart(node, chartConfig);
-  }
+  };
 
   render() {
     return (
@@ -158,7 +158,7 @@ class Statistics extends Component {
         </form>
         <div className="card">
           <h5 className="card-header">Posts per Month</h5>
-          <div id="chart" ref="chart"></div>
+          <div id="chart" ref="chart" />
           {/* <canvas id="canvas" ref="canvas" /> */}
         </div>
       </div>
@@ -173,10 +173,12 @@ const mapStateToProps = (state, ownProps) => {
     type: parsed.type || 'posts',
     group: parsed.group || 'month',
     chart: state.stats.chart
-  }
-}
+  };
+};
 
-export default withRouter(connect(mapStateToProps, {
-  fetchStatistics: operations.fetchStatistics,
-  push
-})(Statistics));
+export default withRouter(
+  connect(mapStateToProps, {
+    fetchStatistics: operations.fetchStatistics,
+    push
+  })(Statistics)
+);

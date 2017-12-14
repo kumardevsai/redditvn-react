@@ -1,4 +1,3 @@
-
 // main
 export const MAIN__SHOW_LOADING = 'main/MAIN__SHOW_LOADING';
 export const MAIN__HIDE_LOADING = 'main/MAIN__HIDE_LOADING';
@@ -13,6 +12,7 @@ export const POST__CLEAN_POST = 'post/POST__CLEAN_POST';
 export const POST__RECEIVE_POST = 'post/POST__RECEIVE_POST';
 export const POST__RECEIVE_IMAGES = 'post/POST__RECEIVE_IMAGES';
 export const POST__RECEIVE_COMMENTS = 'post/POST__RECEIVE_COMMENTS';
+export const POST__REQUEST_COMMENTS = 'post/POST__REQUEST_COMMENTS';
 
 // search
 export const SEARCH__ERROR = 'main/SEARCH__ERROR';
@@ -26,6 +26,6 @@ export const USER__RECEIVE_POSTS = 'user/USER__RECEIVE_POSTS';
 
 // stats
 export const STATS__ERROR = 'main/STATS__ERROR';
-export const STATS_STATISTICS__RECEIVE_CHART = 'stats/STATS_STATISTICS__RECEIVE_CHART'
-export const STATS_TOP__RECEIVE_LIST = 'stats/top10/STATS_TOP__RECEIVE_LIST'
-export const STATS_USER__RECEIVE_USERS = 'stats/user/STATS_USER__RECEIVE_USERS'
+export const STATS_STATISTICS__RECEIVE_CHART = 'stats/STATS_STATISTICS__RECEIVE_CHART';
+export const STATS_TOP__RECEIVE_LIST = 'stats/top10/STATS_TOP__RECEIVE_LIST';
+export const STATS_USER__RECEIVE_USERS = 'stats/user/STATS_USER__RECEIVE_USERS';

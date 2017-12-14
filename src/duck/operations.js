@@ -6,11 +6,11 @@ import querystring from 'querystring';
 // main
 export const showLoading = () => {
   return actions.main__ShowLoading();
-}
+};
 
 export const hideLoading = () => {
   return actions.main__HideLoading();
-}
+};
 
 // home
 export const fetchInfo = () => (dispatch, getState) => {
@@ -66,6 +66,7 @@ export const fetchPostById = post_id => (dispatch, getState) => {
 };
 
 export const fetchCommentByPostId = post_id => (dispatch, getState) => {
+  dispatch(actions.post__RequestComment());
   axios
     .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/post/${post_id}/comments`)
     .then(response => {
@@ -103,7 +104,7 @@ export const fetchSearchPosts = (query, page, limit) => dispatch => {
 
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/search?${querystring.stringify({q: query, page, limit})}`)
+    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/search?${querystring.stringify({ q: query, page, limit })}`)
     .then(response => {
       dispatch(actions.search__ReceivePosts(response.data));
       dispatch(actions.main__HideLoading());
@@ -133,7 +134,7 @@ export const fetchUserInfo = user_id => (dispatch, getState) => {
 export const fetchUserPosts = (user_id, page, limit) => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/user/${user_id}/posts?${querystring.stringify({page, limit})}`)
+    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/user/${user_id}/posts?${querystring.stringify({ page, limit })}`)
     .then(response => {
       dispatch(actions.user__ReceivePosts(response.data));
       dispatch(actions.main__HideLoading());
@@ -148,7 +149,7 @@ export const fetchUserPosts = (user_id, page, limit) => (dispatch, getState) => 
 export const fetchUserList = (page, limit) => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/stats/user?${querystring.stringify({page, limit})}`)
+    .get(`${process.env.REACT_APP_SEARCH_REDDITVN_API_URI}/stats/user?${querystring.stringify({ page, limit })}`)
     .then(response => {
       dispatch(actions.stats_user__ReceiveUsers(response.data));
       dispatch(actions.main__HideLoading());
@@ -158,7 +159,7 @@ export const fetchUserList = (page, limit) => (dispatch, getState) => {
       dispatch(actions.stats__Error(error));
       dispatch(actions.main__HideLoading());
     });
-}
+};
 
 export const fetchStatistics = (type, group) => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
@@ -173,7 +174,7 @@ export const fetchStatistics = (type, group) => (dispatch, getState) => {
       dispatch(actions.stats__Error(error));
       dispatch(actions.main__HideLoading());
     });
-}
+};
 
 export const fetchTop = (limit, group) => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
@@ -188,4 +189,4 @@ export const fetchTop = (limit, group) => (dispatch, getState) => {
       dispatch(actions.stats__Error(error));
       dispatch(actions.main__HideLoading());
     });
-}
+};

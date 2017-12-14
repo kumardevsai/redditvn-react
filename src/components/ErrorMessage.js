@@ -6,7 +6,7 @@ const images404Array = [
   'https://www.redditstatic.com/reddit404c.png',
   'https://www.redditstatic.com/reddit404d.png',
   'https://www.redditstatic.com/reddit404e.png'
-]
+];
 
 class ErrorMessage extends PureComponent {
   render() {
@@ -16,9 +16,9 @@ class ErrorMessage extends PureComponent {
     console.log(error);
 
     if (error.response) {
-      error = { ...error, ...error.response.data }
+      error = { ...error, ...error.response.data };
     }
-    
+
     if (error.status === 404) error.title = 'page not found';
 
     error.status = error.status || 301;
@@ -28,11 +28,17 @@ class ErrorMessage extends PureComponent {
 
     return (
       <div className="text-center">
-        {error.image ? (<img className="img-fluid" src={error.image} alt="" />) : null}
-        {error.title ? (<h4 className="mt-4">{error.title}</h4>) : null}
-        {error.message ? (<div className="errorpage-message"><p>[{error.status}] {error.message}</p></div>) : null}
+        {error.image ? <img className="img-fluid" src={error.image} alt="" /> : null}
+        {error.title ? <h4 className="mt-4">{error.title}</h4> : null}
+        {error.message ? (
+          <div className="errorpage-message">
+            <p>
+              [{error.status}] {error.message}
+            </p>
+          </div>
+        ) : null}
       </div>
-    )
+    );
   }
 }
 

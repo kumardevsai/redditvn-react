@@ -1,21 +1,34 @@
 import React, { PureComponent } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 class PostNavigation extends PureComponent {
+  static propTypes = {
+    prevPost: PropTypes.object.isRequired,
+    nextPost: PropTypes.object.isRequired
+  };
+
+  static defaultProps = {
+    prevPost: undefined,
+    nextPost: undefined
+  };
+
   render() {
+    const { prevPost, nextPost } = this.props;
+
     return (
       <aside className="card-body">
         <div className="row">
-          {this.props.prevPost && (
+          {prevPost && (
             <div className="col">
-              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${this.props.prevPost._id}`}>
+              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${prevPost._id}`}>
                 « Prev post
               </Link>
             </div>
           )}
-          {this.props.nextPost && (
+          {nextPost && (
             <div className="col text-right">
-              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${this.props.nextPost._id}`}>
+              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${nextPost._id}`}>
                 Next post »
               </Link>
             </div>

@@ -2,8 +2,19 @@ import React, { PureComponent } from 'react';
 import { Link } from 'react-router-dom';
 import LazyImage from '../LazyImage';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 class PostCommentDetail extends PureComponent {
+  static propTypes = {
+    opId: PropTypes.string.isRequired,
+    comments: PropTypes.array.isRequired
+  };
+
+  static defaultProps = {
+    opId: '0',
+    comments: []
+  };
+
   render() {
     const { opId, comments } = this.props;
 

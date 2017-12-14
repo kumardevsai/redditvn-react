@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { operations } from '../duck';
-import ErrorMessage from '../components/ErrorMessage'
+import ErrorMessage from '../components/ErrorMessage';
 
 class Home extends Component {
   constructor(props) {
@@ -32,14 +32,15 @@ class Home extends Component {
 
   render() {
     if (this.props.error) {
-      return <ErrorMessage error={this.props.error} />
+      return <ErrorMessage error={this.props.error} />;
     }
 
     return (
       <div className="starter-template">
         <form className="pt-5 pb-5" onSubmit={this.onSubmitForm}>
           <div className="form-group">
-            <input id="searchBox"
+            <input
+              id="searchBox"
               className="form-control form-control-lg"
               name="q"
               onChange={this.onQueryChange}
@@ -58,7 +59,8 @@ class Home extends Component {
         </form>
         <p className="lead pt-5">
           Chuyên trang tìm kiếm bài viết Reddit Vietnam
-          <br /> Cảm ơn <code>{this.props.info.memberCount}</code> thành viên đã đóng góp <code>{this.props.info.postCount}</code> bài viết và <code>{this.props.info.commentCount}</code> bình luận.
+          <br /> Cảm ơn <code>{this.props.info.memberCount}</code> thành viên đã đóng góp <code>{this.props.info.postCount}</code> bài viết và{' '}
+          <code>{this.props.info.commentCount}</code> bình luận.
         </p>
       </div>
     );

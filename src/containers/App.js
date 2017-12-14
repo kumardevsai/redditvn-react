@@ -19,15 +19,15 @@ import Stats from './Stats';
 import NotFound from './NotFound';
 
 class App extends Component {
-  componentDidMount(){
-    const ele = document.getElementById('ipl-progress-indicator')
-    if(ele){
+  componentDidMount() {
+    const ele = document.getElementById('ipl-progress-indicator');
+    if (ele) {
       setTimeout(() => {
-        ele.classList.add('available')
+        ele.classList.add('available');
         setTimeout(() => {
-          ele.outerHTML = ''
-        }, 250)
-      }, 250)
+          ele.outerHTML = '';
+        }, 250);
+      }, 250);
     }
   }
 
