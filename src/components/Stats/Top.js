@@ -133,7 +133,7 @@ class Top extends Component {
                         <a href={`https://www.facebook.com/${value._id}`}>{value.name}</a>
                       </div>
                       <Link className="badge badge-primary badge-pill" to={`/user/${value._id}`}>
-                        {value.count}
+                        {value.post_count}
                       </Link>
                     </li>
                   ))}

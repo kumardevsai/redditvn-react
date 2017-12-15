@@ -22,9 +22,9 @@ export const fetchInfo = () => async (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
 
   try {
-    const user_count = await axios.get(`${process.env.REACT_APP_API_URI}/stats/count/users`);
-    const post_count = await axios.get(`${process.env.REACT_APP_API_URI}/stats/count/posts`);
-    const comment_count = await axios.get(`${process.env.REACT_APP_API_URI}/stats/count/comments`);
+    const user_count = await axios.get(`${process.env.REACT_APP_API_URI}/users/count`);
+    const post_count = await axios.get(`${process.env.REACT_APP_API_URI}/posts/count`);
+    const comment_count = await axios.get(`${process.env.REACT_APP_API_URI}/posts/count/comments`);
     dispatch(actions.home__ReceiveInfo({
       user_count: user_count.data.count,
       post_count: post_count.data.count,
@@ -57,7 +57,7 @@ export const fetchPostById = post_id => (dispatch, getState) => {
   dispatch(actions.post__CleanPost());
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_API_URI}/post/${post_id}`)
+    .get(`${process.env.REACT_APP_API_URI}/posts/${post_id}`)
     .then(response => {
       dispatch(actions.post__ReceivePost(response.data));
       dispatch(actions.main__HideLoading());
@@ -73,7 +73,7 @@ export const fetchPostById = post_id => (dispatch, getState) => {
 export const fetchCommentByPostId = post_id => (dispatch, getState) => {
   dispatch(actions.post__RequestComment());
   axios
-    .get(`${process.env.REACT_APP_API_URI}/post/${post_id}/comments-merge`)
+    .get(`${process.env.REACT_APP_API_URI}/posts/${post_id}/comments-merge`)
     .then(response => {
       dispatch(actions.post__ReceiveComment(response.data));
     })
@@ -84,7 +84,7 @@ export const fetchCommentByPostId = post_id => (dispatch, getState) => {
 
 export const fetchImageByPostId = post_id => (dispatch, getState) => {
   axios
-    .get(`${process.env.REACT_APP_API_URI}/post/${post_id}/attachments`)
+    .get(`${process.env.REACT_APP_API_URI}/posts/${post_id}/attachments`)
     .then(response => {
       dispatch(actions.post__ReceiveImages(response.data));
     })
@@ -125,7 +125,7 @@ export const fetchSearchPosts = (query, page, limit) => dispatch => {
 export const fetchUserInfo = user_id => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_API_URI}/user/${user_id}`)
+    .get(`${process.env.REACT_APP_API_URI}/users/${user_id}`)
     .then(response => {
       dispatch(actions.user__ReceiveInfo(response.data));
     })
@@ -139,7 +139,7 @@ export const fetchUserInfo = user_id => (dispatch, getState) => {
 export const fetchUserPosts = (user_id, page, limit) => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_API_URI}/user/${user_id}/posts?${querystring.stringify({ page, limit })}`)
+    .get(`${process.env.REACT_APP_API_URI}/users/${user_id}/posts?${querystring.stringify({ page, limit })}`)
     .then(response => {
       dispatch(actions.user__ReceivePosts(response.data));
       dispatch(actions.main__HideLoading());
@@ -154,7 +154,7 @@ export const fetchUserPosts = (user_id, page, limit) => (dispatch, getState) => 
 export const fetchUserList = (page, limit) => (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
   axios
-    .get(`${process.env.REACT_APP_API_URI}/user?${querystring.stringify({ page, limit })}`)
+    .get(`${process.env.REACT_APP_API_URI}/users?${querystring.stringify({ page, limit })}`)
     .then(response => {
       dispatch(actions.stats_user__ReceiveUsers(response.data));
       dispatch(actions.main__HideLoading());
@@ -184,9 +184,9 @@ export const fetchStatistics = (type, group) => (dispatch, getState) => {
 export const fetchTop = (limit, since, until) => async (dispatch, getState) => {
   dispatch(actions.main__ShowLoading());
   try {
-    const topUsersRes = await axios.get(`${process.env.REACT_APP_API_URI}/stats/top/users/?limit=${limit}&since=${since}&until=${until}`);
-    const topLikesRes = await axios.get(`${process.env.REACT_APP_API_URI}/stats/top/likes/?limit=${limit}&since=${since}&until=${until}`);
-    const topCommentsRes = await axios.get(`${process.env.REACT_APP_API_URI}/stats/top/comments/?limit=${limit}&since=${since}&until=${until}`);
+    const topUsersRes = await axios.get(`${process.env.REACT_APP_API_URI}/users/top/?limit=${limit}&since=${since}&until=${until}`);
+    const topLikesRes = await axios.get(`${process.env.REACT_APP_API_URI}/posts/top/likes/?limit=${limit}&since=${since}&until=${until}`);
+    const topCommentsRes = await axios.get(`${process.env.REACT_APP_API_URI}/posts/top/comments/?limit=${limit}&since=${since}&until=${until}`);
 
     dispatch(actions.stats_top__ReceiveList({
       top_users: topUsersRes.data.data,
