@@ -6,6 +6,7 @@ import LazyImage from '../LazyImage';
 import url from 'url';
 import deepEqual from 'deep-equal';
 import { push } from 'react-router-redux';
+import moment from 'moment';
 
 class Top extends Component {
   constructor(props) {
@@ -60,7 +61,26 @@ class Top extends Component {
   }
 
   fetchTopStats = () => {
-    this.props.fetchTop(this.props.limit, this.props.group);
+    let time = moment();
+    switch (this.props.group) {
+      case 'today':
+        time = time.startOf('day');
+        break;
+      case '7days':
+        time = time.add(-7, 'day');
+        break;
+      case '30days':
+        time = time.add(-30, 'day');
+        break;
+      default:
+        time = moment(0);
+        break;
+    }
+
+    const since = time.unix();
+    const until = moment().unix();
+
+    this.props.fetchTop(this.props.limit, since, until);
   };
 
   render() {

@@ -28,7 +28,7 @@ export const mainReducer = (state = mainInitialState, action) => {
 const homeInitialState = {
   stats_count: {
     post_count: 0,
-    member_count: 0,
+    user_count: 0,
     comment_count: 0
   },
   error: undefined

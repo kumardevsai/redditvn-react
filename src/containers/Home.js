@@ -61,7 +61,7 @@ class Home extends Component {
         </form>
         <p className="lead pt-5">
           Chuyên trang tìm kiếm bài viết Reddit Vietnam
-          <br /> Cảm ơn <code>{stats_count.member_count}</code> thành viên đã đóng góp <code>{stats_count.post_count}</code> bài viết và{' '}
+          <br /> Cảm ơn <code>{stats_count.user_count}</code> thành viên đã đóng góp <code>{stats_count.post_count}</code> bài viết và{' '}
           <code>{stats_count.comment_count}</code> bình luận.
         </p>
       </div>

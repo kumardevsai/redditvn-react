@@ -28,10 +28,10 @@ Node.js 8.x.x
 Create .env file in project folder
 
 ```
-REACT_APP_SEARCH_REDDITVN_API_URI
+REACT_APP_API_URI
 ```
 
 Example
 ```
-REACT_APP_SEARCH_REDDITVN_API_URI=https://api.redditvn.com
+REACT_APP_API_URI=https://api.redditvn.com
 ```
