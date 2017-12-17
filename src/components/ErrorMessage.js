@@ -15,13 +15,13 @@ class ErrorMessage extends PureComponent {
     if (!error) error = new Error('');
     console.log(error);
 
-    if (error.response) {
-      error = { ...error, ...error.response.data };
+    if (error.response && error.response.data) {
+      error = { ...error, ...error.response.data.error };
     }
 
-    if (error.status === 404) error.title = 'page not found';
+    if (error.code === 404) error.title = 'page not found';
 
-    error.status = error.status || 301;
+    error.code = error.code || 400;
     error.image = images404Array[Math.floor(Math.random() * images404Array.length)];
     error.title = error.title || 'something when wrong...';
     error.message = error.message || JSON.stringify(error, undefined, 2);
@@ -33,7 +33,7 @@ class ErrorMessage extends PureComponent {
         {error.message ? (
           <div className="errorpage-message">
             <p>
-              [{error.status}] {error.message}
+              [{error.code}] {error.message}
             </p>
           </div>
         ) : null}
