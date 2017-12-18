@@ -189,9 +189,9 @@ export const fetchTop = (limit, since, until) => async (dispatch, getState) => {
     const topCommentsRes = await axios.get(`${process.env.REACT_APP_API_URI}/posts/top/comments/?limit=${limit}&since=${since}&until=${until}`);
 
     dispatch(actions.stats_top__ReceiveList({
-      top_users: topUsersRes.data.data,
-      top_likes: topLikesRes.data.data,
-      top_comments: topCommentsRes.data.data
+      top_users: topUsersRes.data.docs,
+      top_likes: topLikesRes.data.docs,
+      top_comments: topCommentsRes.data.docs
     }));
     dispatch(actions.main__HideLoading());
   } catch (error) {
