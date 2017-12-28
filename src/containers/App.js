@@ -18,6 +18,9 @@ import User from './User';
 import Stats from './Stats';
 import NotFound from './NotFound';
 
+import { ApolloProvider } from 'react-apollo';
+import client from '../graphqlClient';
+
 class App extends Component {
   componentDidMount() {
     const ele = document.getElementById('ipl-progress-indicator');
@@ -33,22 +36,24 @@ class App extends Component {
 
   render() {
     return (
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <ScrollToTop>
-            <Layout>
-              <Switch>
-                <Route exact path="/" component={Home} />
-                <Route exact path="/search" component={Search} />
-                <Route exact path="/post/:post_id" component={Post} />
-                <Route exact path="/user/:user_id" component={User} />
-                <Route path="/stats" component={Stats} />
-                <Route component={NotFound} />
-              </Switch>
-            </Layout>
-          </ScrollToTop>
-        </ConnectedRouter>
-      </Provider>
+      <ApolloProvider client={client}>
+        <Provider store={store}>
+          <ConnectedRouter history={history}>
+            <ScrollToTop>
+              <Layout>
+                <Switch>
+                  <Route exact path="/" component={Home} />
+                  <Route exact path="/search" component={Search} />
+                  <Route exact path="/post/:post_id" component={Post} />
+                  <Route exact path="/user/:user_id" component={User} />
+                  <Route path="/stats" component={Stats} />
+                  <Route component={NotFound} />
+                </Switch>
+              </Layout>
+            </ScrollToTop>
+          </ConnectedRouter>
+        </Provider>
+      </ApolloProvider>
     );
   }
 }

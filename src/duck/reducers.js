@@ -24,92 +24,6 @@ export const mainReducer = (state = mainInitialState, action) => {
   }
 };
 
-// home
-const homeInitialState = {
-  stats_count: {
-    post_count: 0,
-    user_count: 0,
-    comment_count: 0
-  },
-  error: undefined
-};
-export const homeReducer = (state = homeInitialState, action) => {
-  switch (action.type) {
-    case types.HOME__RECEIVE_INFO:
-      return {
-        ...state,
-        stats_count: action.stats_count,
-        error: undefined
-      };
-
-    case types.HOME__ERROR:
-      return {
-        ...state,
-        error: action.error
-      };
-
-    default:
-      return state;
-  }
-};
-
-// post
-const postInitialState = {
-  detail: {},
-  images: [],
-  comments: [],
-  error: undefined,
-  isLoadingComment: false
-};
-export const postReducer = (state = postInitialState, action) => {
-  switch (action.type) {
-    case types.POST__RECEIVE_POST:
-      return {
-        ...state,
-        detail: action.detail,
-        error: undefined
-      };
-
-    case types.POST__RECEIVE_IMAGES:
-      return {
-        ...state,
-        images: action.images
-      };
-
-    case types.POST__RECEIVE_COMMENTS:
-      return {
-        ...state,
-        comments: action.comments,
-        isLoadingComment: false
-      };
-
-    case types.POST__CLEAN_POST:
-      return {
-        ...state,
-        detail: postInitialState.detail,
-        images: postInitialState.images,
-        comments: postInitialState.comments,
-        error: undefined,
-        isLoadingComment: false
-      };
-
-    case types.POST__REQUEST_COMMENTS:
-      return {
-        ...state,
-        isLoadingComment: true
-      };
-
-    case types.POST__ERROR:
-      return {
-        ...state,
-        error: action.error
-      };
-
-    default:
-      return state;
-  }
-};
-
 // search
 const searchInitialState = {
   posts: [],
@@ -218,8 +132,6 @@ export const statsReducer = (state = statsInitialState, action) => {
 //combineReducers
 export default {
   main: mainReducer,
-  home: homeReducer,
-  post: postReducer,
   search: searchReducer,
   user: userReducer,
   stats: statsReducer

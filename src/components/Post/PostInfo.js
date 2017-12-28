@@ -20,10 +20,12 @@ class PostInfo extends PureComponent {
   };
 
   render() {
-    const { likesCount, commentsCount, showDetail, postId, isDeleted } = this.props;
+    const { r, u, likesCount, commentsCount, showDetail, postId, isDeleted } = this.props;
 
     return (
       <div className="card-body">
+        {r && <span className="badge badge-pill badge-primary mr-1">r/{r}</span>}
+        {u && <span className="badge badge-pill badge-primary mr-1">u/{u}</span>}
         {likesCount > 0 && <span className="badge badge-pill badge-primary mr-1">{likesCount} likes</span>}
         {commentsCount > 0 && showDetail ? (
           <a className="badge badge-pill badge-secondary mr-1" href={`#comment`}>

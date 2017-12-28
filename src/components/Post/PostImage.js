@@ -1,29 +1,31 @@
 import React, { PureComponent } from 'react';
 import LazyImage from '../LazyImage';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 class PostImage extends PureComponent {
   static propTypes = {
-    images: PropTypes.array.isRequired
+    images: PropTypes.object.isRequired
   };
 
   static defaultProps = {
-    images: []
+    images: {}
   };
 
   render() {
     const { images } = this.props;
 
-    if (!images || images.length === 0) {
+    const edges = _.get(images, 'edges', undefined);
+    if (!edges) {
       return null;
     }
 
     return (
       <div className="card-body blog-post-image text-center">
-        {images.map((item, index) => (
+        {edges.map((item, index) => (
           <div className="mb-2" key={index}>
-            <a href={item.url}>
-              <LazyImage className="rounded" src={item.src} />
+            <a href={item.node.url}>
+              <LazyImage className="rounded" src={item.node.src} />
             </a>
           </div>
         ))}

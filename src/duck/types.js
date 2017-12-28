@@ -2,18 +2,6 @@
 export const MAIN__SHOW_LOADING = 'main/MAIN__SHOW_LOADING';
 export const MAIN__HIDE_LOADING = 'main/MAIN__HIDE_LOADING';
 
-// home
-export const HOME__RECEIVE_INFO = 'home/HOME__RECEIVE_INFO';
-export const HOME__ERROR = 'main/HOME__ERROR';
-
-// post
-export const POST__ERROR = 'main/POST__ERROR';
-export const POST__CLEAN_POST = 'post/POST__CLEAN_POST';
-export const POST__RECEIVE_POST = 'post/POST__RECEIVE_POST';
-export const POST__RECEIVE_IMAGES = 'post/POST__RECEIVE_IMAGES';
-export const POST__RECEIVE_COMMENTS = 'post/POST__RECEIVE_COMMENTS';
-export const POST__REQUEST_COMMENTS = 'post/POST__REQUEST_COMMENTS';
-
 // search
 export const SEARCH__ERROR = 'main/SEARCH__ERROR';
 export const SEARCH__SET_QUERY = 'search/SEARCH__SET_QUERY';

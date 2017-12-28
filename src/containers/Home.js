@@ -4,6 +4,25 @@ import { push } from 'react-router-redux';
 import { operations } from '../duck';
 import ErrorMessage from '../components/ErrorMessage';
 
+import { graphql, withApollo, compose } from 'react-apollo';
+import gql from 'graphql-tag';
+
+const getRandom = gql`
+  query getRandom($q: String) {
+    random(q: $q) {
+      _id
+    }
+  }
+`;
+
+const getCount = gql`
+  query getCount {
+    usersCount: count(type: USERS)
+    postsCount: count(type: POSTS)
+    commentsCount: count(type: COMMENTS)
+  }
+`;
+
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -16,9 +35,25 @@ class Home extends Component {
     this.setState({ query: e.target.value });
   };
 
-  onClickRandomPost = e => {
+  onClickRandomPost = async e => {
     e.preventDefault();
-    this.props.fetchRandomPostId(this.state.query);
+    this.props.showLoading();
+
+    const { query } = this.props.client;
+    try {
+      const response = await query({
+        query: getRandom,
+        variable: {
+          q: this.state.query
+        },
+        fetchPolicy: 'network-only'
+      });
+      this.props.hideLoading();
+      this.props.push(`/post/${response.data.random._id}`)
+    } catch (error) {
+      console.log('ERROR: random', error)
+      this.props.hideLoading();
+    }
   };
 
   onSubmitForm = e => {
@@ -26,12 +61,8 @@ class Home extends Component {
     this.props.push(`/search?q=${encodeURIComponent(this.state.query)}`);
   };
 
-  componentDidMount() {
-    this.props.fetchInfo();
-  }
-
   render() {
-    const { error, stats_count } = this.props;
+    const { data, data: { loading, error } } = this.props;
 
     if (error) {
       return <ErrorMessage error={error} />;
@@ -59,23 +90,26 @@ class Home extends Component {
             <input className="btn btn-secondary mb-1" name="action" value="Random Post" type="submit" onClick={this.onClickRandomPost} />
           </div>
         </form>
-        <p className="lead pt-5">
-          Chuyên trang tìm kiếm bài viết Reddit Vietnam
-          <br /> Cảm ơn <code>{stats_count.user_count}</code> thành viên đã đóng góp <code>{stats_count.post_count}</code> bài viết và{' '}
-          <code>{stats_count.comment_count}</code> bình luận.
-        </p>
+        {!loading && (
+          <p className="lead pt-5">
+            Chuyên trang tìm kiếm bài viết Reddit Vietnam
+            <br /> Cảm ơn <code>{data.usersCount}</code> thành viên đã đóng góp <code>{data.postsCount}</code> bài viết và <code>{data.commentsCount}</code> bình luận.
+          </p>
+        )}
       </div>
     );
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  stats_count: state.home.stats_count,
-  error: state.home.error
-});
+const mapStateToProps = (state, ownProps) => ({});
 
-export default connect(mapStateToProps, {
-  fetchRandomPostId: operations.fetchRandomPostId,
-  fetchInfo: operations.fetchInfo,
-  push
-})(Home);
+export default compose(
+  withApollo,
+  graphql(getCount),
+  connect(mapStateToProps, {
+    fetchRandomPostId: operations.fetchRandomPostId,
+    push,
+    showLoading: operations.showLoading,
+    hideLoading: operations.hideLoading
+  })
+)(Home);

@@ -7,12 +7,12 @@ import PropTypes from 'prop-types';
 class PostCommentDetail extends PureComponent {
   static propTypes = {
     opId: PropTypes.string.isRequired,
-    comments: PropTypes.array.isRequired
+    comments: PropTypes.object.isRequired
   };
 
   static defaultProps = {
     opId: '0',
-    comments: []
+    comments: {}
   };
 
   render() {
@@ -20,16 +20,16 @@ class PostCommentDetail extends PureComponent {
 
     return (
       <div className="comment-content">
-        {comments &&
-          comments.map(comment => (
-            <div key={comment._id}>
+        {comments && comments.edges &&
+          comments.edges.map(commentEdge => (
+            <div key={commentEdge.node._id}>
               <div className="row comment mb-2">
                 <div className="col-auto pr-0">
-                  <Link to={`/user/${comment.from.id}`}>
+                  <Link to={`/user/${commentEdge.node.user.id}`}>
                     <LazyImage
                       className="rounded-circle fb-avatar"
-                      src={`https://graph.facebook.com/${comment.from.id}/picture?width=32`}
-                      alt={comment.from.name}
+                      src={commentEdge.node.user.profile_pic}
+                      alt={commentEdge.node.user.name}
                       height="2rem"
                       width="2rem"
                     />
@@ -37,24 +37,24 @@ class PostCommentDetail extends PureComponent {
                 </div>
                 <div className="col">
                   <span className="cmt-box brko">
-                    <a className={classNames('mr-1', { 'redditvn-op': opId === comment.from.id })} href={`https://www.facebook.com/${comment.from.id}`}>
-                      <span className="font-weight-bold">{comment.from.name}</span>
+                    <a className={classNames('mr-1', { 'redditvn-op': opId === commentEdge.node.user._id })} href={`https://www.facebook.com/${commentEdge.node.user._id}`}>
+                      <span className="font-weight-bold">{commentEdge.node.user.name}</span>
                     </a>
-                    <span>{comment.message}</span>
+                    <span>{commentEdge.node.message}</span>
                   </span>
                 </div>
               </div>
               {/* for reply comment */}
-              {comment.replies &&
-                comment.replies.map(reply => (
-                  <div className="reply-comment ml-3 ml-md-5" key={reply._id}>
+              {commentEdge.node.replies && commentEdge.node.replies.edges &&
+                commentEdge.node.replies.edges.map(replyEdge => (
+                  <div className="reply-comment ml-3 ml-md-5" key={replyEdge.node._id}>
                     <div className="row mb-2">
                       <div className="col-auto pr-0">
-                        <Link to={`/user/${reply.from.id}`}>
+                        <Link to={`/user/${replyEdge.node.user._id}`}>
                           <LazyImage
                             className="rounded-circle fb-avatar"
-                            src={`https://graph.facebook.com/${reply.from.id}/picture?width=32`}
-                            alt={reply.from.name}
+                            src={replyEdge.node.user.profile_pic}
+                            alt={replyEdge.node.user.name}
                             height="1.25rem"
                             width="1.25rem"
                           />
@@ -62,10 +62,10 @@ class PostCommentDetail extends PureComponent {
                       </div>
                       <div className="col">
                         <span className="cmt-box reply-box brko">
-                          <a className={classNames('mr-1', { 'redditvn-op': opId === reply.from.id })} href={`https://www.facebook.com/${reply.from.id}`}>
-                            <span className="font-weight-bold">{reply.from.name}</span>
+                          <a className={classNames('mr-1', { 'redditvn-op': opId === replyEdge.node.user._id })} href={`https://www.facebook.com/${replyEdge.node.user._id}`}>
+                            <span className="font-weight-bold">{replyEdge.node.user.name}</span>
                           </a>
-                          <span>{reply.message}</span>
+                          <span>{replyEdge.node.message}</span>
                         </span>
                       </div>
                     </div>

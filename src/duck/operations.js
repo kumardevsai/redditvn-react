@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import { push, replace } from 'react-router-redux';
+import { replace } from 'react-router-redux';
 import axios from 'axios';
 import querystring from 'querystring';
 
@@ -10,87 +10,6 @@ export const showLoading = () => {
 
 export const hideLoading = () => {
   return actions.main__HideLoading();
-};
-
-// home
-export const fetchInfo = () => async (dispatch, getState) => {
-  const { post_count } = getState().home.stats_count;
-  if (post_count !== 0) {
-    return;
-  }
-
-  dispatch(actions.main__ShowLoading());
-
-  try {
-    const user_count = await axios.get(`${process.env.REACT_APP_API_URI}/users/count`);
-    const post_count = await axios.get(`${process.env.REACT_APP_API_URI}/posts/count`);
-    const comment_count = await axios.get(`${process.env.REACT_APP_API_URI}/posts/count/comments`);
-    dispatch(actions.home__ReceiveInfo({
-      user_count: user_count.data.count,
-      post_count: post_count.data.count,
-      comment_count: comment_count.data.count
-    }));
-    dispatch(actions.main__HideLoading());
-  } catch (error) {
-    console.log(error);
-    dispatch(actions.home__Error(error));
-    dispatch(actions.main__HideLoading());
-  }
-};
-
-export const fetchRandomPostId = query => (dispatch, getState) => {
-  dispatch(actions.main__ShowLoading());
-  axios
-    .get(`${process.env.REACT_APP_API_URI}/random?q=${query}`)
-    .then(response => {
-      dispatch(push(`/post/${response.data._id}`));
-    })
-    .catch(error => {
-      console.log(error);
-      dispatch(actions.home__Error(error));
-      dispatch(actions.main__HideLoading());
-    });
-};
-
-// post
-export const fetchPostById = post_id => (dispatch, getState) => {
-  dispatch(actions.post__CleanPost());
-  dispatch(actions.main__ShowLoading());
-  axios
-    .get(`${process.env.REACT_APP_API_URI}/posts/${post_id}`)
-    .then(response => {
-      dispatch(actions.post__ReceivePost(response.data));
-      dispatch(actions.main__HideLoading());
-      dispatch(fetchImageByPostId(post_id));
-    })
-    .catch(error => {
-      console.log(error);
-      dispatch(actions.post__Error(error));
-      dispatch(actions.main__HideLoading());
-    });
-};
-
-export const fetchCommentByPostId = post_id => (dispatch, getState) => {
-  dispatch(actions.post__RequestComment());
-  axios
-    .get(`${process.env.REACT_APP_API_URI}/posts/${post_id}/comments-merge`)
-    .then(response => {
-      dispatch(actions.post__ReceiveComment(response.data));
-    })
-    .catch(error => {
-      console.log(error);
-    });
-};
-
-export const fetchImageByPostId = post_id => (dispatch, getState) => {
-  axios
-    .get(`${process.env.REACT_APP_API_URI}/posts/${post_id}/attachments`)
-    .then(response => {
-      dispatch(actions.post__ReceiveImages(response.data));
-    })
-    .catch(error => {
-      console.log(error);
-    });
 };
 
 // search

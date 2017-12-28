@@ -7,7 +7,7 @@ import thunk from 'redux-thunk';
 import duckReducer from '../duck/reducers';
 const reducers = combineReducers({
   ...duckReducer,
-  router: routerReducer
+  router: routerReducer,
 });
 
 // Create a history of your choosing (we're using a browser history in this case)

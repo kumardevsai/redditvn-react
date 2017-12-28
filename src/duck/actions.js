@@ -9,46 +9,6 @@ export const main__HideLoading = () => ({
   type: types.MAIN__HIDE_LOADING
 });
 
-// home
-export const home__ReceiveInfo = stats_count => ({
-  type: types.HOME__RECEIVE_INFO,
-  stats_count: stats_count
-});
-
-export const home__Error = error => ({
-  type: types.HOME__ERROR,
-  error
-});
-
-// post
-export const post__Error = error => ({
-  type: types.POST__ERROR,
-  error
-});
-
-export const post__CleanPost = () => ({
-  type: types.POST__CLEAN_POST
-});
-
-export const post__ReceivePost = post => ({
-  type: types.POST__RECEIVE_POST,
-  detail: post
-});
-
-export const post__RequestComment = () => ({
-  type: types.POST__REQUEST_COMMENTS
-});
-
-export const post__ReceiveComment = comments => ({
-  type: types.POST__RECEIVE_COMMENTS,
-  comments: comments
-});
-
-export const post__ReceiveImages = images => ({
-  type: types.POST__RECEIVE_IMAGES,
-  images: images
-});
-
 // search
 export const search__Error = error => ({
   type: types.SEARCH__ERROR,
