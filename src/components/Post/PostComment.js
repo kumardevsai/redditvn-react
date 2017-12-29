@@ -77,10 +77,10 @@ class PostComment extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (deepEqual(this.props, nextProps) === false || deepEqual(this.state, nextState) === false) {
-      return true;
+    if (deepEqual(this.props, nextProps) && deepEqual(this.state, nextState)) {
+      return false;
     }
-    return false;
+    return true;
   }
 
   onClickShowComments = () => {

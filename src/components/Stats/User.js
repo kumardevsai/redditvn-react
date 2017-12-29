@@ -11,7 +11,7 @@ import LazyImage from '../LazyImage';
 
 class User extends Component {
   shouldComponentUpdate(nextProps, nextState) {
-    if (deepEqual(this.props, nextProps) === true) {
+    if (deepEqual(this.props, nextProps) && deepEqual(this.state, nextState)) {
       return false;
     }
     return true;

@@ -41,10 +41,9 @@ class Top extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (deepEqual(this.props, nextProps) === true && deepEqual(this.state, nextState) === true) {
+    if (deepEqual(this.props, nextProps) && deepEqual(this.state, nextState)) {
       return false;
     }
-
     return true;
   }
 

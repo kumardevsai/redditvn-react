@@ -152,12 +152,12 @@ class User extends Component {
 
   componentWillReceiveProps(nextProps) {}
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   if (deepEqual(this.props, nextProps) === true) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
+  shouldComponentUpdate(nextProps, nextState) {
+    if (deepEqual(this.props, nextProps) && deepEqual(this.state, nextState)) {
+      return false;
+    }
+    return true;
+  }
 
   async componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
@@ -288,18 +288,6 @@ class User extends Component {
     this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
-  onClickPostsTab = () => {
-    const newQueryString = { ...this.props.queryString };
-    newQueryString.show = 'posts';
-    this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
-  };
-
-  onClickCommentsTab = () => {
-    const newQueryString = { ...this.props.queryString };
-    newQueryString.show = 'comments';
-    this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
-  };
-
   render() {
     const { data: { loading, error, data } } = this.state;
 
@@ -321,9 +309,7 @@ class User extends Component {
       <div>
         <div className="user-info text-center">
           <div className="user-image">
-            <Link to={`/user/${user._id}`} className="d-inline-block">
-              <LazyImage className="rounded-circle fb-avatar" src={user.profile_pic} alt={user.name} height="8rem" width="8rem" />
-            </Link>
+            <LazyImage className="rounded-circle fb-avatar" src={user.profile_pic} alt={user.name} height="8rem" width="8rem" />
           </div>
           <div className="user-detail">
             <h3>
@@ -334,9 +320,9 @@ class User extends Component {
 
         <ul className="nav nav-pills flex-column flex-sm-row mb-3" id="list-tab" role="tablist">
           <li className="nav-item">
-            <a className={classNames('nav-link ', { active: this.props.queryString.show === 'posts' })} data-toggle="tab" href="#posts" role="tab" onClick={this.onClickPostsTab}>
+            <a className={classNames('nav-link', 'active')} data-toggle="tab" href="#posts" role="tab">
               Posts
-              <span class="badge badge-secondary badge-pill ml-2">{user.posts_count}</span>
+              <span className="badge badge-secondary badge-pill ml-2">{user.posts_count}</span>
             </a>
           </li>
 
@@ -346,16 +332,15 @@ class User extends Component {
               data-toggle="tab"
               href="#comments"
               role="tab"
-              onClick={this.onClickCommentsTab}
             >
               Comments
-              <span class="badge badge-secondary badge-pill ml-2">{user.comments_count}</span>
+              <span className="badge badge-secondary badge-pill ml-2">{user.comments_count}</span>
             </a>
           </li>
         </ul>
 
         <div className="tab-content">
-          <div className={classNames('tab-pane', { active: this.props.queryString.show === 'posts' })} id="posts" role="tabpanel">
+          <div className={classNames('tab-pane', 'active')} id="posts" role="tabpanel">
             <div className="nav justify-content-end">
               <Pagination
                 hasNextPage={user.posts.pageInfo.hasNextPage}
@@ -374,7 +359,7 @@ class User extends Component {
               />
             </div>
           </div>
-          <div className={classNames('tab-pane', { active: this.props.queryString.show === 'comments' })} id="comments" role="tabpanel">
+          <div className={classNames('tab-pane')} id="comments" role="tabpanel">
             <div className="nav justify-content-end">
               <Pagination
                 hasNextPage={user.comments.pageInfo.hasNextPage}
@@ -407,7 +392,6 @@ class User extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const parsed = url.parse(ownProps.location.search, true).query;
-  parsed.show = parsed.show || 'posts';
   parsed.pa = parsed.pa || null;
   parsed.pb = parsed.pb || null;
   parsed.pf = parsed.pf || 10;

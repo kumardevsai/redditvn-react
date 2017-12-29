@@ -8,66 +8,174 @@ import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import PostContainer from '../components/Post/PostContainer';
 import ErrorMessage from '../components/ErrorMessage';
+import Spinner from 'react-spinkit';
+import Pagination from '../components/Pagination';
+
+import { withApollo, compose } from 'react-apollo';
+import gql from 'graphql-tag';
+
+const getPosts = gql`
+  query getPosts($query: String, $first: Int, $after: String, $last: Int, $before: String) {
+    posts(first: $first, after: $after, last: $last, before: $before, q: $query) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+        totalCount
+      }
+      edges {
+        cursor
+        node {
+          _id
+          user {
+            _id
+            name
+            profile_pic
+          }
+          r
+          u
+          message
+          created_time
+          comments_count
+          likes_count
+          is_deleted
+        }
+      }
+    }
+  }
+`;
 
 class Search extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: {}
+    };
+  }
+
   componentWillReceiveProps(nextProps) {}
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (deepEqual(this.props, nextProps) === true) {
+    if (deepEqual(this.props, nextProps) && deepEqual(this.state, nextState)) {
       return false;
     }
     return true;
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
-      this.fetchNewSearch();
+      this.props.showLoading();
+      this.props.setSearch(this.props.queryString.q);
+      const { query } = this.props.client;
+      const response = await query({
+        query: getPosts,
+        variables: {
+          query: this.props.queryString.q,
+          first: this.props.queryString.f,
+          after: this.props.queryString.a,
+          last: this.props.queryString.l,
+          before: this.props.queryString.b
+        }
+      });
+
+      const newResult = {
+        ...this.state.data,
+        data: {
+          ...this.state.data.data,
+          posts: response.data.posts
+        }
+      };
+
+      this.setState({ data: newResult });
+      this.props.hideLoading();
     }
   }
 
-  componentDidMount() {
-    this.fetchNewSearch();
+  async componentDidMount() {
+    this.props.showLoading();
+    this.props.setSearch(this.props.queryString.q);
+
+    const { query } = this.props.client;
+    const response = await query({
+      query: getPosts,
+      variables: {
+        query: this.props.queryString.q,
+        first: this.props.queryString.f,
+        after: this.props.queryString.a,
+        last: this.props.queryString.l,
+        before: this.props.queryString.b
+      }
+    });
+
+    this.setState({ data: response });
+    this.props.hideLoading();
   }
 
-  fetchNewSearch = () => {
-    this.props.setSearch(this.props.queryString.q);
-    this.props.fetchSearchPosts(this.props.queryString.q, this.props.queryString.page, this.props.queryString.limit);
+  onClickNextPagePost = () => {
+    const { data: { posts } } = this.state.data;
+    const newQueryString = { ...this.props.queryString };
+    newQueryString.a = posts.pageInfo.endCursor;
+    newQueryString.b = null;
+    newQueryString.f = 10;
+    newQueryString.l = null;
+
+    this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
-  onPageChange = ({ selected }) => {
-    const newQueryString = { ...this.props.queryString, page: selected + 1 };
+  onClickPreviousPagePost = () => {
+    const { data: { posts } } = this.state.data;
+    const newQueryString = { ...this.props.queryString };
+    newQueryString.a = null;
+    newQueryString.b = posts.pageInfo.startCursor;
+    newQueryString.f = null;
+    newQueryString.l = 10;
+
     this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
   render() {
-    if (this.props.error) {
-      return <ErrorMessage error={this.props.error} />;
+    const { data: { loading, error, data } } = this.state;
+
+    if (loading) {
+      return <Spinner name="three-bounce" />;
     }
 
-    if (!this.props.posts.docs) {
+    if (error) {
+      return <ErrorMessage error={error} />;
+    }
+
+    if (!data || !data.posts) {
       return null;
     }
 
-    const curPage = parseInt(this.props.posts.page - 1, 10);
-
-    const pagnite =
-      this.props.posts.docs.length > 0 ? (
-        <div className="nav justify-content-end">
-          <CustomPaginate currentPage={curPage} totalPage={this.props.posts.pages} onPageChange={this.onPageChange} />
-        </div>
-      ) : null;
+    const posts = data.posts;
 
     return (
       <div>
         <div className="alert alert-primary" role="alert">
-          Tìm thấy {this.props.posts.total} bài viết có từ khóa '{this.props.query}'
+          Tìm thấy {posts.pageInfo.totalCount} bài viết có từ khóa '{this.props.query}'
         </div>
 
-        {pagnite}
+        <div className="nav justify-content-end">
+          <Pagination
+            hasNextPage={posts.pageInfo.hasNextPage}
+            hasPreviousPage={posts.pageInfo.hasPreviousPage}
+            onClickNextPage={this.onClickNextPagePost}
+            onClickPreviousPage={this.onClickPreviousPagePost}
+          />
+        </div>
 
-        <div className="blog-main">{this.props.posts.docs && this.props.posts.docs.map(value => <PostContainer key={value._id} postId={value._id} post={value} />)}</div>
+        <div className="blog-main">{posts.edges && posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
 
-        {pagnite}
+        <div className="nav justify-content-end">
+          <Pagination
+            hasNextPage={posts.pageInfo.hasNextPage}
+            hasPreviousPage={posts.pageInfo.hasPreviousPage}
+            onClickNextPage={this.onClickNextPagePost}
+            onClickPreviousPage={this.onClickPreviousPagePost}
+          />
+        </div>
       </div>
     );
   }
@@ -75,20 +183,24 @@ class Search extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const parsed = url.parse(ownProps.location.search, true).query;
-  if (!parsed.q) parsed.q = '';
-  if (!parsed.page) parsed.page = 1;
-  if (!parsed.limit) parsed.limit = 10;
+  parsed.q = parsed.q || '';
+  parsed.a = parsed.a || null;
+  parsed.b = parsed.b || null;
+  parsed.f = parsed.f || 10;
+  parsed.l = parsed.l || null;
 
   return {
     queryString: parsed,
-    posts: state.search.posts,
-    query: state.search.query,
-    error: state.search.error
+    query: state.search.query
   };
 };
 
-export default connect(mapStateToProps, {
-  fetchSearchPosts: operations.fetchSearchPosts,
-  setSearch: operations.setSearch,
-  push
-})(Search);
+export default compose(
+  connect(mapStateToProps, {
+    push,
+    setSearch: operations.setSearch,
+    showLoading: operations.showLoading,
+    hideLoading: operations.hideLoading
+  }),
+  withApollo
+)(Search);

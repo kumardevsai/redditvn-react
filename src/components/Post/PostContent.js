@@ -22,10 +22,10 @@ class PostContent extends Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (deepEqual(this.props, nextProps) === false) {
-      return true;
+    if (deepEqual(this.props, nextProps) && deepEqual(this.state, nextState)) {
+      return false;
     }
-    return false;
+    return true;
   }
 
   componentDidUpdate(prevProps, prevState) {
