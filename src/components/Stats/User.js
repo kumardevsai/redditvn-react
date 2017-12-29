@@ -99,12 +99,12 @@ class User extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const parsed = url.parse(ownProps.location.search, true).query;
-  if (!parsed.page) parsed.page = 1;
-  if (!parsed.limit) parsed.limit = 25;
+  const query = url.parse(ownProps.location.search, true).query;
+  query.page = query.page || 1;
+  query.limit = query.limit || 25;
 
   return {
-    queryString: parsed,
+    queryString: query,
     users: state.stats.users
   };
 };

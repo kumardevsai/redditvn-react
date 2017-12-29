@@ -17,6 +17,7 @@ import Post from './Post';
 import User from './User';
 import Stats from './Stats';
 import SubReddit from './SubReddit';
+import UserReddit from './UserReddit';
 import NotFound from './NotFound';
 
 import { ApolloProvider } from 'react-apollo';
@@ -46,6 +47,7 @@ class App extends Component {
                   <Route exact path="/" component={Home} />
                   <Route exact path="/search" component={Search} />
                   <Route exact path="/r/:subreddit" component={SubReddit} />
+                  <Route exact path="/u/:ureddit" component={UserReddit} />
                   <Route exact path="/post/:post_id" component={Post} />
                   <Route exact path="/user/:user_id" component={User} />
                   <Route path="/stats" component={Stats} />

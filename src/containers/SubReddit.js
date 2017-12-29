@@ -10,9 +10,7 @@ import { Link } from 'react-router-dom';
 import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
-import PostCommentDetail from '../components/Post/PostCommentDetail';
 import _ from 'lodash';
-import classNames from 'classnames';
 import { operations } from '../duck';
 
 import { withApollo, compose } from 'react-apollo';
@@ -200,14 +198,14 @@ class SubReddit extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const parsed = url.parse(ownProps.location.search, true).query;
-  parsed.a = parsed.a || null;
-  parsed.b = parsed.b || null;
-  parsed.f = parsed.f || 10;
-  parsed.l = parsed.l || null;
+  const query = url.parse(ownProps.location.search, true).query;
+  query.a = query.a || null;
+  query.b = query.b || null;
+  query.f = query.f || 10;
+  query.l = query.l || null;
 
   return {
-    queryString: parsed,
+    queryString: query,
     subreddit: ownProps.match.params.subreddit
   };
 };

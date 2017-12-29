@@ -1,52 +1,60 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { operations } from '../duck';
-import CustomPaginate from '../components/CustomPaginate';
+import Pagination from '../components/Pagination';
 import url from 'url';
 import querystring from 'querystring';
 import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import PostContainer from '../components/Post/PostContainer';
+import { Link } from 'react-router-dom';
+import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
-import Pagination from '../components/Pagination';
+import _ from 'lodash';
+import { operations } from '../duck';
 
 import { withApollo, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
-const getPosts = gql`
-  query getPosts($query: String, $first: Int, $after: String, $last: Int, $before: String) {
-    posts(first: $first, after: $after, last: $last, before: $before, q: $query) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-        totalCount
-      }
-      edges {
-        cursor
-        node {
+const getPostsWithUserReddit = gql`
+query getPostsWithUserReddit($name: String!, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
+  u(name: $name) {
+    comment_karma
+    icon_img
+    link_karma
+    name
+  }
+  posts(first: $first, after: $after, last: $last, before: $before, u: $ureddit) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+      totalCount
+    }
+    edges {
+      cursor
+      node {
+        _id
+        user {
           _id
-          user {
-            _id
-            name
-            profile_pic
-          }
-          r
-          u
-          message
-          created_time
-          comments_count
-          likes_count
-          is_deleted
+          name
+          profile_pic
         }
+        r
+        u
+        message
+        created_time
+        comments_count
+        likes_count
+        is_deleted
       }
     }
   }
+}
 `;
 
-class Search extends Component {
+class UserReddit extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -66,12 +74,12 @@ class Search extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
       this.props.showLoading();
-      this.props.setSearch(this.props.queryString.q);
       const { query } = this.props.client;
       const response = await query({
-        query: getPosts,
+        query: getPostsWithUserReddit,
         variables: {
-          query: this.props.queryString.q,
+          name: this.props.ureddit,
+          ureddit: this.props.ureddit,
           first: this.props.queryString.f,
           after: this.props.queryString.a,
           last: this.props.queryString.l,
@@ -94,13 +102,13 @@ class Search extends Component {
 
   async componentDidMount() {
     this.props.showLoading();
-    this.props.setSearch(this.props.queryString.q);
-
     const { query } = this.props.client;
+
     const response = await query({
-      query: getPosts,
+      query: getPostsWithUserReddit,
       variables: {
-        query: this.props.queryString.q,
+        name: this.props.ureddit,
+        ureddit: this.props.ureddit,
         first: this.props.queryString.f,
         after: this.props.queryString.a,
         last: this.props.queryString.l,
@@ -149,12 +157,19 @@ class Search extends Component {
       return null;
     }
 
-    const posts = data.posts;
+    const { posts, u } = data;
 
     return (
       <div>
-        <div className="alert alert-primary" role="alert">
-          Tìm thấy {posts.pageInfo.totalCount} bài viết có từ khóa '{this.props.query}'
+        <div className="user-info text-center">
+          <div className="user-image">
+            <LazyImage className="rounded-circle fb-avatar" src={u.icon_img} alt={u.name} height="8rem" width="8rem" />
+          </div>
+          <div className="user-detail">
+            <h3>
+              <a href={`https://reddit.com/r/${u.name}`}>{u.name}</a>
+            </h3>
+          </div>
         </div>
 
         <div className="nav justify-content-end">
@@ -176,6 +191,7 @@ class Search extends Component {
             onClickPreviousPage={this.onClickPreviousPagePost}
           />
         </div>
+
       </div>
     );
   }
@@ -183,7 +199,6 @@ class Search extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
-  query.q = query.q || '';
   query.a = query.a || null;
   query.b = query.b || null;
   query.f = query.f || 10;
@@ -191,16 +206,15 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     queryString: query,
-    query: state.search.query
+    ureddit: ownProps.match.params.ureddit
   };
 };
 
 export default compose(
   connect(mapStateToProps, {
     push,
-    setSearch: operations.setSearch,
     showLoading: operations.showLoading,
     hideLoading: operations.hideLoading
   }),
   withApollo
-)(Search);
+)(UserReddit);

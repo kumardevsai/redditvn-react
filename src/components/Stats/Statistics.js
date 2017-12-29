@@ -168,11 +168,11 @@ class Statistics extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const parsed = url.parse(ownProps.location.search, true).query;
+  const query = url.parse(ownProps.location.search, true).query;
 
   return {
-    type: parsed.type || 'posts',
-    group: parsed.group || 'month',
+    type: query.type || 'posts',
+    group: query.group || 'month',
     chart: state.stats.chart
   };
 };

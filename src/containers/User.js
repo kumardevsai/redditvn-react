@@ -391,19 +391,19 @@ class User extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const parsed = url.parse(ownProps.location.search, true).query;
-  parsed.pa = parsed.pa || null;
-  parsed.pb = parsed.pb || null;
-  parsed.pf = parsed.pf || 10;
-  parsed.pl = parsed.pl || null;
+  const query = url.parse(ownProps.location.search, true).query;
+  query.pa = query.pa || null;
+  query.pb = query.pb || null;
+  query.pf = query.pf || 10;
+  query.pl = query.pl || null;
 
-  parsed.ca = parsed.ca || null;
-  parsed.cb = parsed.cb || null;
-  parsed.cf = parsed.cf || 30;
-  parsed.cl = parsed.cl || null;
+  query.ca = query.ca || null;
+  query.cb = query.cb || null;
+  query.cf = query.cf || 30;
+  query.cl = query.cl || null;
 
   return {
-    queryString: parsed,
+    queryString: query,
     userId: ownProps.match.params.user_id
   };
 };

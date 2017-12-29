@@ -200,11 +200,11 @@ class Top extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const parsed = url.parse(ownProps.location.search, true).query;
+  const query = url.parse(ownProps.location.search, true).query;
 
   return {
-    limit: parsed.limit || '10',
-    group: parsed.group || 'today',
+    limit: query.limit || '10',
+    group: query.group || 'today',
     top: state.stats.top
   };
 };
