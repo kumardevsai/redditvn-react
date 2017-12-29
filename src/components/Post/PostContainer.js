@@ -20,7 +20,7 @@ class PostContainer extends PureComponent {
   };
 
   render() {
-    const { post, prevPost, nextPost } = this.props.data;
+    const { post, prevPost, nextPost } = this.props;
     const showDetail = this.props.showDetail === true;
 
     if (post._id === undefined) {

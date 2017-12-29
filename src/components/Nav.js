@@ -33,7 +33,7 @@ class Nav extends Component {
     return (
       <nav className="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <NavLink exact to="/" className="navbar-brand">
-          search.redditvn
+          redditvn.com
         </NavLink>
         <button
           className="navbar-toggler"

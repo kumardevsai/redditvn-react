@@ -2,14 +2,15 @@ import React, { Component } from 'react';
 import PostContainer from '../components/Post/PostContainer';
 import { connect } from 'react-redux';
 import ErrorMessage from '../components/ErrorMessage';
+import Spinner from 'react-spinkit';
 
-import { graphql, withApollo, compose } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import base64 from 'base-64';
 import gql from 'graphql-tag';
 import _ from 'lodash';
 
 const getPost = gql`
-  query getPost($post_id: String!, $cursor: Cursor, $first: Int) {
+  query getPost($post_id: String!, $cursor: String) {
     post(id: $post_id) {
       _id
       user {
@@ -41,7 +42,7 @@ const getPost = gql`
         }
       }
     }
-    nextPost: posts(first: $first, last: 1, before: $cursor) {
+    nextPost: posts(last: 1, before: $cursor) {
       edges {
         node {
           _id
@@ -55,7 +56,7 @@ class Post extends Component {
     if (this.props.postId !== nextProps.postId) {
       this.props.data.refetch({
         post_id: nextProps.postId,
-        cursor: base64.encode(nextProps.postId),
+        cursor: base64.encode(`{"lastId":"${nextProps.postId}"}`),
         first: null
       });
     }
@@ -65,7 +66,7 @@ class Post extends Component {
     const { data, data: { loading, error } } = this.props;
 
     if (loading) {
-      return <p>Loading ...</p>;
+      return <Spinner name='three-bounce' />;
     }
 
     if (error) {
@@ -73,7 +74,7 @@ class Post extends Component {
     }
 
     if (!data.post) {
-      return <p>Not found post</p>;
+      return <ErrorMessage error={new Error('No post found.')} />;
     }
 
     const prevPost = _.get(data, 'prevPost.edges[0].node', undefined);
@@ -82,11 +83,9 @@ class Post extends Component {
     return (
       <PostContainer
         postId={data.post._id}
-        data={{
-          post: data.post,
-          prevPost: prevPost,
-          nextPost: nextPost
-        }}
+        post={data.post}
+        nextPost={prevPost}
+        prevPost={nextPost}
         showDetail={true}
       />
     );
@@ -98,13 +97,12 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 export default compose(
-  connect(mapStateToProps, {}),
-  withApollo,
+  connect(mapStateToProps),
   graphql(getPost, {
     options: props => ({
       variables: {
         post_id: props.postId,
-        cursor: base64.encode(props.postId),
+        cursor: base64.encode(`{"lastId":"${props.postId}"}`),
         first: null
       }
     })

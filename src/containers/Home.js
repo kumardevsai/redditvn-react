@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { operations } from '../duck';
 import ErrorMessage from '../components/ErrorMessage';
+import Spinner from 'react-spinkit';
 
 import { graphql, withApollo, compose } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -49,9 +50,9 @@ class Home extends Component {
         fetchPolicy: 'network-only'
       });
       this.props.hideLoading();
-      this.props.push(`/post/${response.data.random._id}`)
+      this.props.push(`/post/${response.data.random._id}`);
     } catch (error) {
-      console.log('ERROR: random', error)
+      console.log('ERROR: random', error);
       this.props.hideLoading();
     }
   };
@@ -90,7 +91,9 @@ class Home extends Component {
             <input className="btn btn-secondary mb-1" name="action" value="Random Post" type="submit" onClick={this.onClickRandomPost} />
           </div>
         </form>
-        {!loading && (
+        {loading ? (
+          <Spinner name="three-bounce" />
+        ) : (
           <p className="lead pt-5">
             Chuyên trang tìm kiếm bài viết Reddit Vietnam
             <br /> Cảm ơn <code>{data.usersCount}</code> thành viên đã đóng góp <code>{data.postsCount}</code> bài viết và <code>{data.commentsCount}</code> bình luận.

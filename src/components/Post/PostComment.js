@@ -3,19 +3,21 @@ import deepEqual from 'deep-equal';
 import PostCommentDetail from './PostCommentDetail';
 import PropTypes from 'prop-types';
 import ErrorMessage from '../ErrorMessage';
+import Spinner from 'react-spinkit';
 
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import _ from 'lodash';
 
 const getComments = gql`
-  query getComments($post_id: String!, $cursor: Cursor) {
+  query getComments($post_id: String!, $cursor: String) {
     post(id: $post_id) {
       _id
       comments(first: 10, after: $cursor) {
         pageInfo {
           hasNextPage
           hasPreviousPage
+          endCursor
         }
         edges {
           cursor
@@ -53,7 +55,7 @@ class PostComment extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      show_comment: true
+      show_button_more: true
     };
   }
 
@@ -70,7 +72,7 @@ class PostComment extends Component {
   componentWillReceiveProps(nextProps) {
     const hasNextPage = _.get(nextProps, 'data.post.comments.pageInfo.hasNextPage', undefined);
     if (hasNextPage === false) {
-      this.setState({show_comment: false})
+      this.setState({ show_button_more: false });
     }
   }
 
@@ -84,13 +86,13 @@ class PostComment extends Component {
   onClickShowComments = () => {
     const { postId, data: { fetchMore, post } } = this.props;
 
-    const lastCursor = post.comments.edges[post.comments.edges.length - 1].cursor;
+    const endCursor = _.get(post, 'comments.pageInfo.endCursor', undefined);
 
     fetchMore({
       query: getComments,
       variables: {
         post_id: postId,
-        cursor: lastCursor
+        cursor: endCursor
       },
       updateQuery: (previousResult, { fetchMoreResult, queryVariables }) => {
         const edges = [...previousResult.post.comments.edges, ...fetchMoreResult.post.comments.edges];
@@ -104,9 +106,6 @@ class PostComment extends Component {
             }
           }
         };
-        console.log('hasNextPage', fetchMoreResult.post.comments.pageInfo.hasNextPage);
-        console.log('hasPreviousPage', fetchMoreResult.post.comments.pageInfo.hasPreviousPage);
-        console.log('count', fetchMoreResult.post.comments.edges.length);
         return newResult;
       }
     });
@@ -114,11 +113,7 @@ class PostComment extends Component {
 
   render() {
     const { opId, data: { loading, error, post } } = this.props;
-    const { show_comment } = this.state;
-
-    if (loading) {
-      return <p>Loading ...</p>;
-    }
+    const { show_button_more } = this.state;
 
     if (error) {
       return <ErrorMessage error={error} />;
@@ -126,10 +121,16 @@ class PostComment extends Component {
 
     return (
       <div className="card-body" id="comment">
-        <PostCommentDetail opId={opId} comments={post.comments} />
-        {show_comment && <button type="button" className="btn btn-primary" onClick={this.onClickShowComments}>
-          Show more comments
-        </button>}
+        {post && post.comments && <PostCommentDetail opId={opId} comments={post.comments} />}
+        {loading ? (
+          <Spinner name="three-bounce" />
+        ) : (
+          show_button_more && (
+            <button type="button" className="btn btn-primary" onClick={this.onClickShowComments}>
+              Show more comments
+            </button>
+          )
+        )}
       </div>
     );
   }
@@ -141,7 +142,8 @@ export default compose(
       variables: {
         post_id: props.postId,
         cursor: null
-      }
+      },
+      notifyOnNetworkStatusChange: true
     })
   })
 )(PostComment);

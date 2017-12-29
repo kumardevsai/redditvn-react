@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 
 class PostCommentDetail extends PureComponent {
   static propTypes = {
-    opId: PropTypes.string.isRequired,
+    opId: PropTypes.string,
     comments: PropTypes.object.isRequired
   };
 
@@ -25,7 +25,7 @@ class PostCommentDetail extends PureComponent {
             <div key={commentEdge.node._id}>
               <div className="row comment mb-2">
                 <div className="col-auto pr-0">
-                  <Link to={`/user/${commentEdge.node.user.id}`}>
+                  <Link to={`/user/${commentEdge.node.user._id}`}>
                     <LazyImage
                       className="rounded-circle fb-avatar"
                       src={commentEdge.node.user.profile_pic}
