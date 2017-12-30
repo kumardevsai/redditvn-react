@@ -6,7 +6,6 @@ import querystring from 'querystring';
 import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import PostContainer from '../components/Post/PostContainer';
-import { Link } from 'react-router-dom';
 import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
@@ -146,7 +145,9 @@ class User extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {}
+      data: {},
+      loading: true,
+      error: undefined
     };
   }
 
@@ -163,89 +164,106 @@ class User extends Component {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
       if (this.props.queryString.ca !== prevProps.queryString.ca || this.props.queryString.cb !== prevProps.queryString.cb) {
         this.props.showLoading();
+        this.setState({ loading: true });
         const { query } = this.props.client;
-        const response = await query({
-          query: getUserComments,
-          variables: {
-            user_id: this.props.userId,
-            comment_first: this.props.queryString.cf,
-            comment_after: this.props.queryString.ca,
-            comment_last: this.props.queryString.cl,
-            comment_before: this.props.queryString.cb
-          }
-        });
 
-        const newResult = {
-          ...this.state.data,
-          data: {
-            ...this.state.data.data,
+        try {
+          const response = await query({
+            query: getUserComments,
+            variables: {
+              user_id: this.props.userId,
+              comment_first: this.props.queryString.cf,
+              comment_after: this.props.queryString.ca,
+              comment_last: this.props.queryString.cl,
+              comment_before: this.props.queryString.cb
+            }
+          });
+
+          const newResult = {
+            ...this.state.data,
             user: {
-              ...this.state.data.data.user,
+              ...this.state.data.user,
               comments: response.data.user.comments
             }
-          }
-        };
+          };
 
-        this.setState({ data: newResult });
+          this.setState({ data: newResult });
+        } catch (error) {
+          this.setState({ error: error });
+        }
+
         this.props.hideLoading();
+        this.setState({ loading: false });
       }
 
       if (this.props.queryString.pa !== prevProps.queryString.pa || this.props.queryString.pb !== prevProps.queryString.pb) {
         this.props.showLoading();
+        this.setState({ loading: true });
         const { query } = this.props.client;
-        const response = await query({
-          query: getUserPosts,
-          variables: {
-            user_id: this.props.userId,
-            post_first: this.props.queryString.pf,
-            post_after: this.props.queryString.pa,
-            post_last: this.props.queryString.pl,
-            post_before: this.props.queryString.pb
-          }
-        });
 
-        const newResult = {
-          ...this.state.data,
-          data: {
-            ...this.state.data.data,
+        try {
+          const response = await query({
+            query: getUserPosts,
+            variables: {
+              user_id: this.props.userId,
+              post_first: this.props.queryString.pf,
+              post_after: this.props.queryString.pa,
+              post_last: this.props.queryString.pl,
+              post_before: this.props.queryString.pb
+            }
+          });
+
+          const newResult = {
+            ...this.state.data,
             user: {
-              ...this.state.data.data.user,
+              ...this.state.data.user,
               posts: response.data.user.posts
             }
-          }
-        };
+          };
 
-        this.setState({ data: newResult });
+          this.setState({ data: newResult });
+        } catch (error) {
+          this.setState({ error: error });
+        }
+
         this.props.hideLoading();
+        this.setState({ loading: false });
       }
     }
   }
 
   async componentDidMount() {
     this.props.showLoading();
+    this.setState({ loading: true });
     const { query } = this.props.client;
 
-    const response = await query({
-      query: getUser,
-      variables: {
-        user_id: this.props.userId,
-        post_first: this.props.queryString.pf,
-        post_after: this.props.queryString.pa,
-        post_last: this.props.queryString.pl,
-        post_before: this.props.queryString.pb,
-        comment_first: this.props.queryString.cf,
-        comment_after: this.props.queryString.ca,
-        comment_last: this.props.queryString.cl,
-        comment_before: this.props.queryString.cb
-      }
-    });
+    try {
+      const response = await query({
+        query: getUser,
+        variables: {
+          user_id: this.props.userId,
+          post_first: this.props.queryString.pf,
+          post_after: this.props.queryString.pa,
+          post_last: this.props.queryString.pl,
+          post_before: this.props.queryString.pb,
+          comment_first: this.props.queryString.cf,
+          comment_after: this.props.queryString.ca,
+          comment_last: this.props.queryString.cl,
+          comment_before: this.props.queryString.cb
+        }
+      });
 
-    this.setState({ data: response });
+      this.setState({ data: response.data });
+    } catch (error) {
+      this.setState({ error: error });
+    }
+
     this.props.hideLoading();
+    this.setState({ loading: false });
   }
 
   onClickNextPagePost = () => {
-    const { data: { user } } = this.state.data;
+    const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.pa = _.last(user.posts.edges).cursor;
     newQueryString.pb = null;
@@ -256,7 +274,7 @@ class User extends Component {
   };
 
   onClickPreviousPagePost = () => {
-    const { data: { user } } = this.state.data;
+    const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.pa = null;
     newQueryString.pb = _.first(user.posts.edges).cursor;
@@ -267,7 +285,7 @@ class User extends Component {
   };
 
   onClickNextPageComment = () => {
-    const { data: { user } } = this.state.data;
+    const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.ca = _.last(user.comments.edges).cursor;
     newQueryString.cb = null;
@@ -278,7 +296,7 @@ class User extends Component {
   };
 
   onClickPreviousPageComment = () => {
-    const { data: { user } } = this.state.data;
+    const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.ca = null;
     newQueryString.cb = _.first(user.comments.edges).cursor;
@@ -289,7 +307,7 @@ class User extends Component {
   };
 
   render() {
-    const { data: { loading, error, data } } = this.state;
+    const { loading, error, data: { user } } = this.state;
 
     if (loading) {
       return <Spinner name="three-bounce" />;
@@ -299,92 +317,94 @@ class User extends Component {
       return <ErrorMessage error={error} />;
     }
 
-    if (!data || !data.user) {
+    if (!user) {
       return null;
     }
 
-    const user = data.user;
-
     return (
       <div>
-        <div className="user-info text-center">
-          <div className="user-image">
-            <LazyImage className="rounded-circle fb-avatar" src={user.profile_pic} alt={user.name} height="8rem" width="8rem" />
+        {user && (
+          <div className="user-info text-center">
+            <div className="user-image">
+              <LazyImage className="rounded-circle fb-avatar" src={user.profile_pic} alt={user.name} height="8rem" width="8rem" />
+            </div>
+            <div className="user-detail">
+              <h3>
+                <a href={`https://www.facebook.com/${user._id}`}>{user.name}</a>
+              </h3>
+            </div>
           </div>
-          <div className="user-detail">
-            <h3>
-              <a href={`https://www.facebook.com/${user._id}`}>{user.name}</a>
-            </h3>
-          </div>
-        </div>
+        )}
 
-        <ul className="nav nav-pills flex-column flex-sm-row mb-3" id="list-tab" role="tablist">
-          <li className="nav-item">
-            <a className={classNames('nav-link', 'active')} data-toggle="tab" href="#posts" role="tab">
-              Posts
-              <span className="badge badge-secondary badge-pill ml-2">{user.posts_count}</span>
-            </a>
-          </li>
+        {user && (
+          <ul className="nav nav-pills flex-column flex-sm-row mb-3" id="list-tab" role="tablist">
+            <li className="nav-item">
+              <a className={classNames('nav-link', 'active')} data-toggle="tab" href="#posts" role="tab">
+                Posts
+                <span className="badge badge-secondary badge-pill ml-2">{user.posts_count}</span>
+              </a>
+            </li>
 
-          <li className="nav-item">
-            <a
-              className={classNames('nav-link', { active: this.props.queryString.show === 'comments' })}
-              data-toggle="tab"
-              href="#comments"
-              role="tab"
-            >
-              Comments
-              <span className="badge badge-secondary badge-pill ml-2">{user.comments_count}</span>
-            </a>
-          </li>
-        </ul>
+            <li className="nav-item">
+              <a className={classNames('nav-link', { active: this.props.queryString.show === 'comments' })} data-toggle="tab" href="#comments" role="tab">
+                Comments
+                <span className="badge badge-secondary badge-pill ml-2">{user.comments_count}</span>
+              </a>
+            </li>
+          </ul>
+        )}
 
         <div className="tab-content">
-          <div className={classNames('tab-pane', 'active')} id="posts" role="tabpanel">
-            <div className="nav justify-content-end">
-              <Pagination
-                hasNextPage={user.posts.pageInfo.hasNextPage}
-                hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
-                onClickNextPage={this.onClickNextPagePost}
-                onClickPreviousPage={this.onClickPreviousPagePost}
-              />
-            </div>
-            {user.posts && user.posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}
-            <div className="nav justify-content-end">
-              <Pagination
-                hasNextPage={user.posts.pageInfo.hasNextPage}
-                hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
-                onClickNextPage={this.onClickNextPagePost}
-                onClickPreviousPage={this.onClickPreviousPagePost}
-              />
-            </div>
-          </div>
-          <div className={classNames('tab-pane')} id="comments" role="tabpanel">
-            <div className="nav justify-content-end">
-              <Pagination
-                hasNextPage={user.comments.pageInfo.hasNextPage}
-                hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
-                onClickNextPage={this.onClickNextPageComment}
-                onClickPreviousPage={this.onClickPreviousPageComment}
-              />
-            </div>
-            <div className={classNames('card mb-3')}>
-              <div className="card-header">
-                <PostCommentDetail comments={user.comments} />
+          {user.posts &&
+            user.posts.edges && (
+              <div className={classNames('tab-pane', 'active')} id="posts" role="tabpanel">
+                <div className="nav justify-content-end">
+                  <Pagination
+                    hasNextPage={user.posts.pageInfo.hasNextPage}
+                    hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
+                    onClickNextPage={this.onClickNextPagePost}
+                    onClickPreviousPage={this.onClickPreviousPagePost}
+                  />
+                </div>
+                {user.posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}
+                <div className="nav justify-content-end">
+                  <Pagination
+                    hasNextPage={user.posts.pageInfo.hasNextPage}
+                    hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
+                    onClickNextPage={this.onClickNextPagePost}
+                    onClickPreviousPage={this.onClickPreviousPagePost}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="nav justify-content-end">
-              <Pagination
-                hasNextPage={user.comments.pageInfo.hasNextPage}
-                hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
-                onClickNextPage={this.onClickNextPageComment}
-                onClickPreviousPage={this.onClickPreviousPageComment}
-              />
-            </div>
-          </div>
-        </div>
+            )}
 
-        {/* <div className="blog-main">{this.props.userPosts.docs && this.props.userPosts.docs.map(value => <PostContainer key={value._id} postId={value._id} post={value} />)}</div> */}
+          {user.comments &&
+            user.comments.edges && (
+              <div className={classNames('tab-pane')} id="comments" role="tabpanel">
+                <div className="nav justify-content-end">
+                  <Pagination
+                    hasNextPage={user.comments.pageInfo.hasNextPage}
+                    hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
+                    onClickNextPage={this.onClickNextPageComment}
+                    onClickPreviousPage={this.onClickPreviousPageComment}
+                  />
+                </div>
+                <div className={classNames('card mb-3')}>
+                  <div className="card-header">
+                    <PostCommentDetail comments={user.comments} />
+                  </div>
+                </div>
+                <div className="nav justify-content-end">
+                  <Pagination
+                    hasNextPage={user.comments.pageInfo.hasNextPage}
+                    hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
+                    onClickNextPage={this.onClickNextPageComment}
+                    onClickPreviousPage={this.onClickPreviousPageComment}
+                  />
+                </div>
+              </div>
+            )}
+        </div>
       </div>
     );
   }

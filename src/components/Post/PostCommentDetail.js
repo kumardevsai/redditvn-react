@@ -37,9 +37,9 @@ class PostCommentDetail extends PureComponent {
                 </div>
                 <div className="col">
                   <span className="cmt-box brko">
-                    <a className={classNames('mr-1', { 'redditvn-op': opId === commentEdge.node.user._id })} href={`https://www.facebook.com/${commentEdge.node.user._id}`}>
+                    <Link className={classNames('mr-1', { 'redditvn-op': opId === commentEdge.node.user._id })} to={`/user/${commentEdge.node.user._id}`}>
                       <span className="font-weight-bold">{commentEdge.node.user.name}</span>
-                    </a>
+                    </Link>
                     <span>{commentEdge.node.message}</span>
                   </span>
                 </div>
@@ -62,9 +62,9 @@ class PostCommentDetail extends PureComponent {
                       </div>
                       <div className="col">
                         <span className="cmt-box reply-box brko">
-                          <a className={classNames('mr-1', { 'redditvn-op': opId === replyEdge.node.user._id })} href={`https://www.facebook.com/${replyEdge.node.user._id}`}>
+                          <Link className={classNames('mr-1', { 'redditvn-op': opId === replyEdge.node.user._id })} to={`/user/${replyEdge.node.user._id}`}>
                             <span className="font-weight-bold">{replyEdge.node.user.name}</span>
-                          </a>
+                          </Link>
                           <span>{replyEdge.node.message}</span>
                         </span>
                       </div>

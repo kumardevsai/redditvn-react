@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { operations } from '../duck';
-import url from 'url';
-import querystring from 'querystring';
-import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
-import PostContainer from '../components/Post/PostContainer';
+import querystring from 'querystring';
+import url from 'url';
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
+import { Link } from 'react-router-dom';
+import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
+import { operations } from '../duck';
 import Pagination from '../components/Pagination';
 
 import { withApollo, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
-const getPosts = gql`
-  query getPosts($query: String, $first: Int, $after: String, $last: Int, $before: String) {
-    posts(first: $first, after: $after, last: $last, before: $before, q: $query) {
+const getUsers = gql`
+  query getUsers($query: String, $first: Int, $after: String, $last: Int, $before: String) {
+    users(first: $first, after: $after, last: $last, before: $before, q: $query) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -27,25 +28,17 @@ const getPosts = gql`
         cursor
         node {
           _id
-          user {
-            _id
-            name
-            profile_pic
-          }
-          r
-          u
-          message
-          created_time
+          name
+          profile_pic
+          posts_count
           comments_count
-          likes_count
-          is_deleted
         }
       }
     }
   }
 `;
 
-class Search extends Component {
+class Users extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -54,8 +47,6 @@ class Search extends Component {
       error: undefined
     };
   }
-
-  componentWillReceiveProps(nextProps) {}
 
   shouldComponentUpdate(nextProps, nextState) {
     if (deepEqual(this.props, nextProps) && deepEqual(this.state, nextState)) {
@@ -68,12 +59,11 @@ class Search extends Component {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
       this.props.showLoading();
       this.setState({ loading: true });
-      this.props.setSearch(this.props.queryString.q);
       const { query } = this.props.client;
 
       try {
         const response = await query({
-          query: getPosts,
+          query: getUsers,
           variables: {
             query: this.props.queryString.q,
             first: this.props.queryString.f,
@@ -85,7 +75,7 @@ class Search extends Component {
 
         const newResult = {
           ...this.state.data,
-          posts: response.data.posts
+          users: response.data.users
         };
 
         this.setState({ data: newResult });
@@ -101,13 +91,12 @@ class Search extends Component {
   async componentDidMount() {
     this.props.showLoading();
     this.setState({ loading: true });
-    this.props.setSearch(this.props.queryString.q);
 
     const { query } = this.props.client;
 
     try {
       const response = await query({
-        query: getPosts,
+        query: getUsers,
         variables: {
           query: this.props.queryString.q,
           first: this.props.queryString.f,
@@ -127,29 +116,29 @@ class Search extends Component {
   }
 
   onClickNextPage = () => {
-    const { posts } = this.state.data;
+    const { users } = this.state.data;
     const newQueryString = { ...this.props.queryString };
-    newQueryString.a = posts.pageInfo.endCursor;
+    newQueryString.a = users.pageInfo.endCursor;
     newQueryString.b = null;
-    newQueryString.f = 10;
+    newQueryString.f = 100;
     newQueryString.l = null;
 
     this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
   onClickPreviousPage = () => {
-    const { posts } = this.state.data;
+    const { users } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.a = null;
-    newQueryString.b = posts.pageInfo.startCursor;
+    newQueryString.b = users.pageInfo.startCursor;
     newQueryString.f = null;
-    newQueryString.l = 10;
+    newQueryString.l = 100;
 
     this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
   render() {
-    const { loading, error, data: { posts } } = this.state;
+    const { loading, error, data: { users } } = this.state;
 
     if (loading) {
       return <Spinner name="three-bounce" />;
@@ -159,31 +148,59 @@ class Search extends Component {
       return <ErrorMessage error={error} />;
     }
 
-    if (!posts) {
-      return null;
-    }
-
     return (
       <div>
-        <div className="alert alert-primary" role="alert">
-          Tìm thấy {posts.pageInfo.totalCount} bài viết có từ khóa '{this.props.query}'
-        </div>
-
         <div className="nav justify-content-end">
           <Pagination
-            hasNextPage={posts.pageInfo.hasNextPage}
-            hasPreviousPage={posts.pageInfo.hasPreviousPage}
+            hasNextPage={users.pageInfo.hasNextPage}
+            hasPreviousPage={users.pageInfo.hasPreviousPage}
             onClickNextPage={this.onClickNextPage}
             onClickPreviousPage={this.onClickPreviousPage}
           />
         </div>
 
-        <div className="blog-main">{posts.edges && posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
+        <div className="card mb-3">
+          <h5 className="card-header">The ranking of {users.pageInfo.totalCount} RedditVN members</h5>
+          <table className="table table-hover table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th className="text-center" scope="col">
+                  Posts
+                </th>
+                <th className="text-center" scope="col">
+                  Comments
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.edges &&
+                users.edges.map(value => (
+                  <tr key={value.node._id}>
+                    <td>
+                      <Link to={`/user/${value.node._id}`} className="d-inline-block mr-2">
+                        <LazyImage
+                          className="rounded-circle fb-avatar"
+                          src={`https://graph.facebook.com/${value.node._id}/picture?width=32`}
+                          alt={value.node.name}
+                          height="2rem"
+                          width="2rem"
+                        />
+                      </Link>
+                      <Link to={`/user/${value.node._id}`}>{value.node.name}</Link>
+                    </td>
+                    <td className="text-center">{value.node.posts_count}</td>
+                    <td className="text-center">{value.node.comments_count}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
 
         <div className="nav justify-content-end">
           <Pagination
-            hasNextPage={posts.pageInfo.hasNextPage}
-            hasPreviousPage={posts.pageInfo.hasPreviousPage}
+            hasNextPage={users.pageInfo.hasNextPage}
+            hasPreviousPage={users.pageInfo.hasPreviousPage}
             onClickNextPage={this.onClickNextPage}
             onClickPreviousPage={this.onClickPreviousPage}
           />
@@ -195,24 +212,22 @@ class Search extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
-  query.q = query.q || '';
+  query.q = query.q || null;
   query.a = query.a || null;
   query.b = query.b || null;
-  query.f = query.f || 10;
+  query.f = query.f || 100;
   query.l = query.l || null;
 
   return {
-    queryString: query,
-    query: state.search.query
+    queryString: query
   };
 };
 
 export default compose(
   connect(mapStateToProps, {
     push,
-    setSearch: operations.setSearch,
     showLoading: operations.showLoading,
     hideLoading: operations.hideLoading
   }),
   withApollo
-)(Search);
+)(Users);

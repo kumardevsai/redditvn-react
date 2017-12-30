@@ -26,9 +26,7 @@ export const mainReducer = (state = mainInitialState, action) => {
 
 // search
 const searchInitialState = {
-  posts: [],
   query: '',
-  error: undefined
 };
 export const searchReducer = (state = searchInitialState, action) => {
   switch (action.type) {
@@ -36,51 +34,6 @@ export const searchReducer = (state = searchInitialState, action) => {
       return {
         ...state,
         query: action.query
-      };
-
-    case types.SEARCH__RECEIVE_POSTS:
-      return {
-        ...state,
-        posts: action.posts,
-        error: undefined
-      };
-
-    case types.SEARCH__ERROR:
-      return {
-        ...state,
-        error: action.error
-      };
-
-    default:
-      return state;
-  }
-};
-
-// user
-const userInitialState = {
-  info: {},
-  posts: [],
-  error: undefined
-};
-export const userReducer = (state = userInitialState, action) => {
-  switch (action.type) {
-    case types.USER__RECEIVE_INFO:
-      return {
-        ...state,
-        info: action.info,
-        error: undefined
-      };
-
-    case types.USER__RECEIVE_POSTS:
-      return {
-        ...state,
-        posts: action.posts
-      };
-
-    case types.USER__ERROR:
-      return {
-        ...state,
-        error: action.error
       };
 
     default:
@@ -111,13 +64,6 @@ export const statsReducer = (state = statsInitialState, action) => {
         error: undefined
       };
 
-    case types.STATS_USER__RECEIVE_USERS:
-      return {
-        ...state,
-        users: action.users,
-        error: undefined
-      };
-
     case types.STATS__ERROR:
       return {
         ...state,
@@ -133,6 +79,5 @@ export const statsReducer = (state = statsInitialState, action) => {
 export default {
   main: mainReducer,
   search: searchReducer,
-  user: userReducer,
   stats: statsReducer
 };

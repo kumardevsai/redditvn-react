@@ -27,9 +27,9 @@ class PostAuthor extends PureComponent {
           </div>
           <div className="col">
             <div className="user-name">
-              <a href={`https://www.facebook.com/${user._id}`}>
+              <Link to={`/user/${user._id}`}>
                 <b>{user.name}</b>
-              </a>
+              </Link>
             </div>
             <div>
               <small>

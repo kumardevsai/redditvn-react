@@ -15,6 +15,7 @@ import Home from './Home';
 import Search from './Search';
 import Post from './Post';
 import User from './User';
+import Users from './Users';
 import Stats from './Stats';
 import SubReddit from './SubReddit';
 import UserReddit from './UserReddit';
@@ -51,6 +52,7 @@ class App extends Component {
                   <Route exact path="/post/:post_id" component={Post} />
                   <Route exact path="/user/:user_id" component={User} />
                   <Route path="/stats" component={Stats} />
+                  <Route path="/users" component={Users} />
                   <Route component={NotFound} />
                 </Switch>
               </Layout>

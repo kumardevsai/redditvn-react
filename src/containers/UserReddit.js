@@ -6,59 +6,59 @@ import querystring from 'querystring';
 import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import PostContainer from '../components/Post/PostContainer';
-import { Link } from 'react-router-dom';
 import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
-import _ from 'lodash';
 import { operations } from '../duck';
 
 import { withApollo, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 const getPostsWithUserReddit = gql`
-query getPostsWithUserReddit($name: String!, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
-  u(name: $name) {
-    comment_karma
-    icon_img
-    link_karma
-    name
-  }
-  posts(first: $first, after: $after, last: $last, before: $before, u: $ureddit) {
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-      totalCount
+  query getPostsWithUserReddit($name: String!, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
+    u(name: $name) {
+      comment_karma
+      icon_img
+      link_karma
+      name
     }
-    edges {
-      cursor
-      node {
-        _id
-        user {
+    posts(first: $first, after: $after, last: $last, before: $before, u: $ureddit) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+        totalCount
+      }
+      edges {
+        cursor
+        node {
           _id
-          name
-          profile_pic
+          user {
+            _id
+            name
+            profile_pic
+          }
+          r
+          u
+          message
+          created_time
+          comments_count
+          likes_count
+          is_deleted
         }
-        r
-        u
-        message
-        created_time
-        comments_count
-        likes_count
-        is_deleted
       }
     }
   }
-}
 `;
 
 class UserReddit extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {}
+      data: {},
+      loading: true,
+      error: undefined
     };
   }
 
@@ -74,7 +74,42 @@ class UserReddit extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
       this.props.showLoading();
+      this.setState({ loading: true });
       const { query } = this.props.client;
+
+      try {
+        const response = await query({
+          query: getPostsWithUserReddit,
+          variables: {
+            name: this.props.ureddit,
+            ureddit: this.props.ureddit,
+            first: this.props.queryString.f,
+            after: this.props.queryString.a,
+            last: this.props.queryString.l,
+            before: this.props.queryString.b
+          }
+        });
+
+        const newResult = {
+          ...this.state.data,
+          posts: response.data.posts
+        };
+        this.setState({ data: newResult });
+      } catch (error) {
+        this.setState({ error: error });
+      }
+
+      this.props.hideLoading();
+      this.setState({ loading: false });
+    }
+  }
+
+  async componentDidMount() {
+    this.props.showLoading();
+    this.setState({ loading: true });
+    const { query } = this.props.client;
+
+    try {
       const response = await query({
         query: getPostsWithUserReddit,
         variables: {
@@ -87,41 +122,17 @@ class UserReddit extends Component {
         }
       });
 
-      const newResult = {
-        ...this.state.data,
-        data: {
-          ...this.state.data.data,
-          posts: response.data.posts
-        }
-      };
-
-      this.setState({ data: newResult });
-      this.props.hideLoading();
+      this.setState({ data: response.data });
+    } catch (error) {
+      this.setState({ error: error });
     }
-  }
 
-  async componentDidMount() {
-    this.props.showLoading();
-    const { query } = this.props.client;
-
-    const response = await query({
-      query: getPostsWithUserReddit,
-      variables: {
-        name: this.props.ureddit,
-        ureddit: this.props.ureddit,
-        first: this.props.queryString.f,
-        after: this.props.queryString.a,
-        last: this.props.queryString.l,
-        before: this.props.queryString.b
-      }
-    });
-
-    this.setState({ data: response });
     this.props.hideLoading();
+    this.setState({ loading: false });
   }
 
-  onClickNextPagePost = () => {
-    const { data: { posts } } = this.state.data;
+  onClickNextPage = () => {
+    const { posts } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.a = posts.pageInfo.endCursor;
     newQueryString.b = null;
@@ -131,8 +142,8 @@ class UserReddit extends Component {
     this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
-  onClickPreviousPagePost = () => {
-    const { data: { posts } } = this.state.data;
+  onClickPreviousPage = () => {
+    const { posts } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.a = null;
     newQueryString.b = posts.pageInfo.startCursor;
@@ -143,7 +154,7 @@ class UserReddit extends Component {
   };
 
   render() {
-    const { data: { loading, error, data } } = this.state;
+    const { loading, error, data: { posts, u } } = this.state;
 
     if (loading) {
       return <Spinner name="three-bounce" />;
@@ -153,45 +164,44 @@ class UserReddit extends Component {
       return <ErrorMessage error={error} />;
     }
 
-    if (!data || !data.posts) {
-      return null;
-    }
-
-    const { posts, u } = data;
-
     return (
       <div>
-        <div className="user-info text-center">
-          <div className="user-image">
-            <LazyImage className="rounded-circle fb-avatar" src={u.icon_img} alt={u.name} height="8rem" width="8rem" />
+        {u && (
+          <div className="user-info text-center">
+            <div className="user-image">
+              <LazyImage className="rounded-circle fb-avatar" src={u.icon_img} alt={u.name} height="8rem" width="8rem" />
+            </div>
+            <div className="user-detail">
+              <h3>
+                <a href={`https://reddit.com/r/${u.name}`}>{u.name}</a>
+              </h3>
+            </div>
           </div>
-          <div className="user-detail">
-            <h3>
-              <a href={`https://reddit.com/r/${u.name}`}>{u.name}</a>
-            </h3>
+        )}
+
+        {posts && (
+          <div>
+            <div className="nav justify-content-end">
+              <Pagination
+                hasNextPage={posts.pageInfo.hasNextPage}
+                hasPreviousPage={posts.pageInfo.hasPreviousPage}
+                onClickNextPage={this.onClickNextPage}
+                onClickPreviousPage={this.onClickPreviousPage}
+              />
+            </div>
+
+            <div className="blog-main">{posts.edges && posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
+
+            <div className="nav justify-content-end">
+              <Pagination
+                hasNextPage={posts.pageInfo.hasNextPage}
+                hasPreviousPage={posts.pageInfo.hasPreviousPage}
+                onClickNextPage={this.onClickNextPage}
+                onClickPreviousPage={this.onClickPreviousPage}
+              />
+            </div>
           </div>
-        </div>
-
-        <div className="nav justify-content-end">
-          <Pagination
-            hasNextPage={posts.pageInfo.hasNextPage}
-            hasPreviousPage={posts.pageInfo.hasPreviousPage}
-            onClickNextPage={this.onClickNextPagePost}
-            onClickPreviousPage={this.onClickPreviousPagePost}
-          />
-        </div>
-
-        <div className="blog-main">{posts.edges && posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
-
-        <div className="nav justify-content-end">
-          <Pagination
-            hasNextPage={posts.pageInfo.hasNextPage}
-            hasPreviousPage={posts.pageInfo.hasPreviousPage}
-            onClickNextPage={this.onClickNextPagePost}
-            onClickPreviousPage={this.onClickPreviousPagePost}
-          />
-        </div>
-
+        )}
       </div>
     );
   }
