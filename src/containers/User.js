@@ -147,6 +147,8 @@ class User extends Component {
     this.state = {
       data: {},
       loading: true,
+      loading_posts: false,
+      loading_comments: false,
       error: undefined
     };
   }
@@ -160,79 +162,23 @@ class User extends Component {
     return true;
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
       if (this.props.queryString.ca !== prevProps.queryString.ca || this.props.queryString.cb !== prevProps.queryString.cb) {
-        this.props.showLoading();
-        this.setState({ loading: true });
-        const { query } = this.props.client;
-
-        try {
-          const response = await query({
-            query: getUserComments,
-            variables: {
-              user_id: this.props.userId,
-              comment_first: this.props.queryString.cf,
-              comment_after: this.props.queryString.ca,
-              comment_last: this.props.queryString.cl,
-              comment_before: this.props.queryString.cb
-            }
-          });
-
-          const newResult = {
-            ...this.state.data,
-            user: {
-              ...this.state.data.user,
-              comments: response.data.user.comments
-            }
-          };
-
-          this.setState({ data: newResult });
-        } catch (error) {
-          this.setState({ error: error });
-        }
-
-        this.props.hideLoading();
-        this.setState({ loading: false });
+        this.fetchUserComments();
       }
 
       if (this.props.queryString.pa !== prevProps.queryString.pa || this.props.queryString.pb !== prevProps.queryString.pb) {
-        this.props.showLoading();
-        this.setState({ loading: true });
-        const { query } = this.props.client;
-
-        try {
-          const response = await query({
-            query: getUserPosts,
-            variables: {
-              user_id: this.props.userId,
-              post_first: this.props.queryString.pf,
-              post_after: this.props.queryString.pa,
-              post_last: this.props.queryString.pl,
-              post_before: this.props.queryString.pb
-            }
-          });
-
-          const newResult = {
-            ...this.state.data,
-            user: {
-              ...this.state.data.user,
-              posts: response.data.user.posts
-            }
-          };
-
-          this.setState({ data: newResult });
-        } catch (error) {
-          this.setState({ error: error });
-        }
-
-        this.props.hideLoading();
-        this.setState({ loading: false });
+        this.fetchUserPosts();
       }
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.fetchUser();
+  }
+
+  fetchUser = async () => {
     this.props.showLoading();
     this.setState({ loading: true });
     const { query } = this.props.client;
@@ -260,7 +206,73 @@ class User extends Component {
 
     this.props.hideLoading();
     this.setState({ loading: false });
-  }
+  };
+
+  fetchUserPosts = async () => {
+    this.setState({ loading_posts: true });
+    const { query } = this.props.client;
+
+    try {
+      const response = await query({
+        query: getUserPosts,
+        variables: {
+          user_id: this.props.userId,
+          post_first: this.props.queryString.pf,
+          post_after: this.props.queryString.pa,
+          post_last: this.props.queryString.pl,
+          post_before: this.props.queryString.pb
+        }
+      });
+
+      const newResult = {
+        ...this.state.data,
+        user: {
+          ...this.state.data.user,
+          posts: response.data.user.posts
+        }
+      };
+
+      this.setState({ data: newResult });
+    } catch (error) {
+      this.setState({ error: error });
+    }
+
+    this.setState({ loading_posts: false });
+  };
+
+  fetchUserComments = async () => {
+    this.props.showLoading();
+    this.setState({ loading_comments: true });
+    const { query } = this.props.client;
+
+    try {
+      const response = await query({
+        query: getUserComments,
+        variables: {
+          user_id: this.props.userId,
+          comment_first: this.props.queryString.cf,
+          comment_after: this.props.queryString.ca,
+          comment_last: this.props.queryString.cl,
+          comment_before: this.props.queryString.cb
+        }
+      });
+
+      const newResult = {
+        ...this.state.data,
+        user: {
+          ...this.state.data.user,
+          comments: response.data.user.comments
+        }
+      };
+
+      this.setState({ data: newResult });
+    } catch (error) {
+      this.setState({ error: error });
+    }
+
+    this.props.hideLoading();
+    this.setState({ loading_comments: false });
+  };
 
   onClickNextPagePost = () => {
     const { user } = this.state.data;
@@ -307,7 +319,7 @@ class User extends Component {
   };
 
   render() {
-    const { loading, error, data: { user } } = this.state;
+    const { loading, error, loading_posts, loading_comments, data: { user } } = this.state;
 
     if (loading) {
       return <Spinner name="three-bounce" />;
@@ -355,55 +367,67 @@ class User extends Component {
         )}
 
         <div className="tab-content">
-          {user.posts &&
-            user.posts.edges && (
-              <div className={classNames('tab-pane', 'active')} id="posts" role="tabpanel">
-                <div className="nav justify-content-end">
-                  <Pagination
-                    hasNextPage={user.posts.pageInfo.hasNextPage}
-                    hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
-                    onClickNextPage={this.onClickNextPagePost}
-                    onClickPreviousPage={this.onClickPreviousPagePost}
-                  />
-                </div>
-                {user.posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}
-                <div className="nav justify-content-end">
-                  <Pagination
-                    hasNextPage={user.posts.pageInfo.hasNextPage}
-                    hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
-                    onClickNextPage={this.onClickNextPagePost}
-                    onClickPreviousPage={this.onClickPreviousPagePost}
-                  />
-                </div>
-              </div>
-            )}
-
-          {user.comments &&
-            user.comments.edges && (
-              <div className={classNames('tab-pane')} id="comments" role="tabpanel">
-                <div className="nav justify-content-end">
-                  <Pagination
-                    hasNextPage={user.comments.pageInfo.hasNextPage}
-                    hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
-                    onClickNextPage={this.onClickNextPageComment}
-                    onClickPreviousPage={this.onClickPreviousPageComment}
-                  />
-                </div>
-                <div className={classNames('card mb-3')}>
-                  <div className="card-header">
-                    <PostCommentDetail comments={user.comments} />
+          <div className={classNames('tab-pane', 'active')} id="posts" role="tabpanel">
+            {loading_posts ? (
+              <Spinner name="three-bounce" />
+            ) : (
+              user.posts &&
+              user.posts.edges && (
+                <div>
+                  <div className="nav justify-content-end">
+                    <Pagination
+                      hasNextPage={user.posts.pageInfo.hasNextPage}
+                      hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
+                      onClickNextPage={this.onClickNextPagePost}
+                      onClickPreviousPage={this.onClickPreviousPagePost}
+                    />
+                  </div>
+                  {user.posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}
+                  <div className="nav justify-content-end">
+                    <Pagination
+                      hasNextPage={user.posts.pageInfo.hasNextPage}
+                      hasPreviousPage={user.posts.pageInfo.hasPreviousPage}
+                      onClickNextPage={this.onClickNextPagePost}
+                      onClickPreviousPage={this.onClickPreviousPagePost}
+                    />
                   </div>
                 </div>
-                <div className="nav justify-content-end">
-                  <Pagination
-                    hasNextPage={user.comments.pageInfo.hasNextPage}
-                    hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
-                    onClickNextPage={this.onClickNextPageComment}
-                    onClickPreviousPage={this.onClickPreviousPageComment}
-                  />
-                </div>
-              </div>
+              )
             )}
+          </div>
+
+          <div className={classNames('tab-pane')} id="comments" role="tabpanel">
+            {loading_comments ? (
+              <Spinner name="three-bounce" />
+            ) : (
+              user.comments &&
+              user.comments.edges && (
+                <div>
+                  <div className="nav justify-content-end">
+                    <Pagination
+                      hasNextPage={user.comments.pageInfo.hasNextPage}
+                      hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
+                      onClickNextPage={this.onClickNextPageComment}
+                      onClickPreviousPage={this.onClickPreviousPageComment}
+                    />
+                  </div>
+                  <div className={classNames('card mb-3')}>
+                    <div className="card-header">
+                      <PostCommentDetail comments={user.comments} />
+                    </div>
+                  </div>
+                  <div className="nav justify-content-end">
+                    <Pagination
+                      hasNextPage={user.comments.pageInfo.hasNextPage}
+                      hasPreviousPage={user.comments.pageInfo.hasPreviousPage}
+                      onClickNextPage={this.onClickNextPageComment}
+                      onClickPreviousPage={this.onClickPreviousPageComment}
+                    />
+                  </div>
+                </div>
+              )
+            )}
+          </div>
         </div>
       </div>
     );

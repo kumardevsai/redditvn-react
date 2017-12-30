@@ -64,7 +64,7 @@ class Nav extends Component {
                 <NavLink exact to="/stats/top" className="dropdown-item">
                   Top 10
                 </NavLink>
-                <NavLink exact to="/stats/user" className="dropdown-item">
+                <NavLink exact to="/users" className="dropdown-item">
                   Top Posters
                 </NavLink>
               </div>

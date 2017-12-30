@@ -6,13 +6,29 @@ import { push } from 'react-router-redux';
 import deepEqual from 'deep-equal';
 import { operations } from '../../duck';
 import url from 'url';
+import querystring from 'querystring';
+
+import { withApollo, compose } from 'react-apollo';
+import gql from 'graphql-tag';
+
+const getChart = gql`
+  query getChart($type: ChartType!, $group: ChartGroup!) {
+    chart(type: $type, group: $group) {
+      label
+      data
+    }
+  }
+`;
 
 class Statistics extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      type: props.type,
-      group: props.group
+      type: props.queryString.type,
+      group: props.queryString.group,
+      data: {},
+      loading: true,
+      error: undefined
     };
   }
 
@@ -26,16 +42,21 @@ class Statistics extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
-    this.props.push(`/stats/?type=${this.state.type}&group=${this.state.group}`);
+    const newQueryString = {
+      ...this.props.queryString,
+      type: this.state.type,
+      group: this.state.group
+    };
+    this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.type !== nextProps.type) {
-      this.setState({ type: nextProps.type });
+    if (this.props.queryString.type !== nextProps.queryString.type) {
+      this.setState({ type: nextProps.queryString.type });
     }
 
-    if (this.props.group !== nextProps.group) {
-      this.setState({ group: nextProps.group });
+    if (this.props.queryString.group !== nextProps.queryString.group) {
+      this.setState({ group: nextProps.queryString.group });
     }
   }
 
@@ -47,41 +68,66 @@ class Statistics extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (deepEqual(this.props.type, prevProps.type) === false) {
-      this.fetchNewStatistics();
-    } else if (deepEqual(this.props.group, prevProps.group) === false) {
-      this.fetchNewStatistics();
+    if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
+      this.fetchChart();
     }
-    if (deepEqual(this.props.chart, prevProps.chart) === false) {
+
+    if (deepEqual(this.state.data, prevState.data) === false) {
       this.updateChart();
     }
   }
 
   componentDidMount() {
-    this.fetchNewStatistics();
-    this.updateChart();
+    this.fetchChart();
   }
 
-  fetchNewStatistics = () => {
-    this.props.fetchStatistics(this.props.type, this.props.group);
+  fetchChart = async () => {
+    this.props.showLoading();
+    this.setState({ loading: true });
+
+    const { query } = this.props.client;
+
+    try {
+      const response = await query({
+        query: getChart,
+        variables: {
+          type: this.props.queryString.type,
+          group: this.props.queryString.group
+        }
+      });
+
+      const newResult = {
+        ...this.state.data,
+        chart: response.data.chart
+      };
+
+      this.setState({ data: newResult });
+    } catch (error) {
+      this.setState({ error: error });
+    }
+
+    this.props.hideLoading();
+    this.setState({ loading: false });
   };
 
   updateChart = () => {
-    const { chart } = this.props;
+    const { chart } = this.state.data;
 
-    console.log(chart);
-    if (!chart || !chart.chart_data) {
+    if (!chart) {
       return;
     }
+
+    const label = chart.label.slice(0);
+    const data = chart.data.slice(0);
 
     const chartConfig = {
       type: 'line',
       data: {
-        labels: chart.chart_data.label,
+        labels: label,
         datasets: [
           {
-            label: chart.group,
-            data: chart.chart_data.data,
+            label: this.props.queryString.type,
+            data: data,
             fill: false
           }
         ]
@@ -99,26 +145,6 @@ class Statistics extends Component {
         hover: {
           mode: 'nearest',
           intersect: true
-        },
-        scales: {
-          xAxes: [
-            {
-              display: true,
-              scaleLabel: {
-                display: true,
-                labelString: chart.group
-              }
-            }
-          ],
-          yAxes: [
-            {
-              display: true,
-              scaleLabel: {
-                display: true,
-                labelString: chart.type
-              }
-            }
-          ]
         }
       }
     };
@@ -141,16 +167,16 @@ class Statistics extends Component {
           <div className="form-row">
             <div className="col form-group">
               <select className="form-control" id="input-type" name="type" value={this.state.type} onChange={this.onTypeChange}>
-                <option value="posts">Posts</option>
-                <option value="comments">Comments</option>
+                <option value="POSTS">Posts</option>
+                <option value="COMMENTS">Comments</option>
               </select>
             </div>
             <div className="col form-group">
               <select className="form-control" id="input-group" name="group" value={this.state.group} onChange={this.onGroupChange}>
-                <option value="hour">Hour</option>
-                <option value="dow">Day of Week</option>
-                <option value="dom">Day of Month</option>
-                <option value="month">Month</option>
+                <option value="HOUR">Hour</option>
+                <option value="DAY_OF_WEEK">Day of Week</option>
+                <option value="DAY_OF_MONTH">Day of Month</option>
+                <option value="MONTH">Month</option>
               </select>
             </div>
           </div>
@@ -169,17 +195,20 @@ class Statistics extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
+  query.type = query.type || 'POSTS';
+  query.group = query.group || 'MONTH';
 
   return {
-    type: query.type || 'posts',
-    group: query.group || 'month',
-    chart: state.stats.chart
+    queryString: query
   };
 };
 
-export default withRouter(
+export default compose(
+  withRouter,
   connect(mapStateToProps, {
-    fetchStatistics: operations.fetchStatistics,
-    push
-  })(Statistics)
-);
+    push,
+    showLoading: operations.showLoading,
+    hideLoading: operations.hideLoading
+  }),
+  withApollo
+)(Statistics);

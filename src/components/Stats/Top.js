@@ -1,19 +1,71 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { operations } from '../../duck';
 import { connect } from 'react-redux';
 import LazyImage from '../LazyImage';
 import url from 'url';
 import deepEqual from 'deep-equal';
 import { push } from 'react-router-redux';
 import moment from 'moment';
+import { operations } from '../../duck';
+import querystring from 'querystring';
+import ErrorMessage from '../../components/ErrorMessage';
+import Spinner from 'react-spinkit';
+
+import { withApollo, compose } from 'react-apollo';
+import gql from 'graphql-tag';
+
+const getTop = gql`
+  query getTop($first: Int, $since: Int, $until: Int) {
+    top {
+      posts_count(first: $first, since: $since, until: $until) {
+        edges {
+          node {
+            _id
+            name
+            profile_pic
+            posts_count
+          }
+        }
+      }
+      likes(first: $first, since: $since, until: $until) {
+        edges {
+          node {
+            _id
+            user {
+              _id
+              name
+              profile_pic
+            }
+            likes_count
+          }
+        }
+      }
+      comments(first: $first, since: $since, until: $until) {
+        edges {
+          node {
+            _id
+            user {
+              _id
+              name
+              profile_pic
+            }
+            comments_count
+          }
+        }
+      }
+    }
+  }
+`;
 
 class Top extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      limit: props.limit,
-      group: props.group
+      limit: props.queryString.limit,
+      group: props.queryString.group,
+      data: {},
+      loading: true,
+      error: undefined
     };
   }
 
@@ -27,16 +79,21 @@ class Top extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
-    this.props.push(`/stats/top/?limit=${this.state.limit}&group=${this.state.group}`);
+    const newQueryString = {
+      ...this.props.queryString,
+      limit: this.state.limit,
+      group: this.state.group
+    };
+    this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.limit !== nextProps.limit) {
-      this.setState({ limit: nextProps.limit });
+    if (this.props.queryString.limit !== nextProps.queryString.limit) {
+      this.setState({ limit: nextProps.queryString.limit });
     }
 
-    if (this.props.group !== nextProps.group) {
-      this.setState({ group: nextProps.group });
+    if (this.props.queryString.group !== nextProps.queryString.group) {
+      this.setState({ group: nextProps.queryString.group });
     }
   }
 
@@ -48,20 +105,18 @@ class Top extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (deepEqual(this.props.limit, prevProps.limit) === false) {
-      this.fetchTopStats();
-    } else if (deepEqual(this.props.group, prevProps.group) === false) {
-      this.fetchTopStats();
+    if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
+      this.fetchTop();
     }
   }
 
   componentDidMount() {
-    this.fetchTopStats();
+    this.fetchTop();
   }
 
-  fetchTopStats = () => {
+  fetchTop = async () => {
     let time = moment();
-    switch (this.props.group) {
+    switch (this.props.queryString.group) {
       case 'today':
         time = time.startOf('day');
         break;
@@ -79,11 +134,51 @@ class Top extends Component {
     const since = time.unix();
     const until = moment().unix();
 
-    this.props.fetchTop(this.props.limit, since, until);
+    this.props.showLoading();
+    this.setState({ loading: true });
+
+    const { query } = this.props.client;
+
+    try {
+      const response = await query({
+        query: getTop,
+        variables: {
+          first: this.props.queryString.limit,
+          since: since,
+          until: until
+        }
+      });
+
+      const newResult = {
+        ...this.state.data,
+        top: response.data.top
+      };
+
+      this.setState({ data: newResult });
+    } catch (error) {
+      this.setState({ error: error });
+    }
+
+    this.props.hideLoading();
+    this.setState({ loading: false });
   };
 
   render() {
-    const { top } = this.props;
+    const { loading, error, data: { top } } = this.state;
+
+    if (loading) {
+      return <Spinner name="three-bounce" />;
+    }
+
+    if (error) {
+      return <ErrorMessage error={error} />;
+    }
+
+    if (!top) {
+      return null;
+    }
+
+    const { posts_count, likes, comments } = top;
 
     return (
       <div>
@@ -116,23 +211,23 @@ class Top extends Component {
                 <Link to="/stats/user">Top posters</Link>
               </h5>
               <ul className="list-group list-group-flush">
-                {top.top_users &&
-                  top.top_users.map(value => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value._id}>
+                {posts_count &&
+                  posts_count.edges.map(value => (
+                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node._id}>
                       <div>
-                        <Link to={`/user/${value._id}`} className="d-inline-block mr-2">
+                        <Link to={`/user/${value.node._id}`} className="d-inline-block mr-2">
                           <LazyImage
                             className="mr-2 rounded-circle fb-avatar"
-                            src={`https://graph.facebook.com/${value._id}/picture?width=24`}
-                            alt={value.name}
+                            src={value.node.profile_pic}
+                            alt={value.node.name}
                             height="1.5rem"
                             width="1.5rem"
                           />
                         </Link>
-                        <a href={`https://www.facebook.com/${value._id}`}>{value.name}</a>
+                        <Link to={`/user/${value.node._id}`}>{value.node.name}</Link>
                       </div>
-                      <Link className="badge badge-primary badge-pill" to={`/user/${value._id}`}>
-                        {value.post_count}
+                      <Link className="badge badge-primary badge-pill" to={`/user/${value.node._id}`}>
+                        {value.node.posts_count}
                       </Link>
                     </li>
                   ))}
@@ -143,23 +238,23 @@ class Top extends Component {
             <div className="card">
               <h5 className="card-header">Most liked posts</h5>
               <ul className="list-group list-group-flush">
-                {top.top_likes &&
-                  top.top_likes.map(value => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value._id}>
+                {likes &&
+                  likes.edges.map(value => (
+                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node._id}>
                       <div>
-                        <Link to={`/user/${value.from.id}`} className="d-inline-block mr-2">
+                        <Link to={`/user/${value.node.user._id}`} className="d-inline-block mr-2">
                           <LazyImage
                             className="rounded-circle fb-avatar"
-                            src={`https://graph.facebook.com/${value.from.id}/picture?width=24`}
-                            alt={value.from.name}
+                            src={value.node.user.profile_pic}
+                            alt={value.node.user.name}
                             height="1.5rem"
                             width="1.5rem"
                           />
                         </Link>
-                        <a href={`https://www.facebook.com/${value._id}`}>{value.from.name}</a>
+                        <Link to={`/post/${value.node._id}`}>{value.node.user.name}</Link>
                       </div>
-                      <Link className="badge badge-primary badge-pill" to={`/post/${value._id}`}>
-                        {value.likes_count}
+                      <Link className="badge badge-primary badge-pill" to={`/post/${value.node._id}`}>
+                        {value.node.likes_count}
                       </Link>
                     </li>
                   ))}
@@ -170,23 +265,23 @@ class Top extends Component {
             <div className="card">
               <h5 className="card-header">Most commented posts</h5>
               <ul className="list-group list-group-flush">
-                {top.top_comments &&
-                  top.top_comments.map(value => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value._id}>
+                {comments &&
+                  comments.edges.map(value => (
+                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node._id}>
                       <div>
-                        <Link to={`/user/${value.from.id}`} className="d-inline-block mr-2">
+                        <Link to={`/user/${value.node.user._id}`} className="d-inline-block mr-2">
                           <LazyImage
                             className="mr-2 rounded-circle fb-avatar"
-                            src={`https://graph.facebook.com/${value.from.id}/picture?width=24`}
-                            alt={value.from.name}
+                            src={value.node.user.profile_pic}
+                            alt={value.node.user.name}
                             height="1.5rem"
                             width="1.5rem"
                           />
                         </Link>
-                        <a href={`https://www.facebook.com/${value._id}`}>{value.from.name}</a>
+                        <Link to={`/post/${value.node._id}`}>{value.node.user.name}</Link>
                       </div>
-                      <Link className="badge badge-primary badge-pill" to={`/post/${value._id}`}>
-                        {value.comments_count}
+                      <Link className="badge badge-primary badge-pill" to={`/post/${value.node._id}`}>
+                        {value.node.comments_count}
                       </Link>
                     </li>
                   ))}
@@ -201,15 +296,19 @@ class Top extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
+  query.limit = query.limit || '10';
+  query.group = query.group || 'today';
 
   return {
-    limit: query.limit || '10',
-    group: query.group || 'today',
-    top: state.stats.top
+    queryString: query
   };
 };
 
-export default connect(mapStateToProps, {
-  fetchTop: operations.fetchTop,
-  push
-})(Top);
+export default compose(
+  connect(mapStateToProps, {
+    push,
+    showLoading: operations.showLoading,
+    hideLoading: operations.hideLoading
+  }),
+  withApollo
+)(Top);

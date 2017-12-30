@@ -21,8 +21,6 @@ class Stats extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  error: state.stats.error
-});
+const mapStateToProps = state => ({});
 
 export default withRouter(connect(mapStateToProps)(Stats));

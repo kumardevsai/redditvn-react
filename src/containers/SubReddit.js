@@ -71,41 +71,17 @@ class SubReddit extends Component {
     return true;
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
-      this.props.showLoading();
-      this.setState({ loading: true });
-      const { query } = this.props.client;
-
-      try {
-        const response = await query({
-          query: getPostsWithSubReddit,
-          variables: {
-            displayName: this.props.subreddit,
-            subreddit: this.props.subreddit,
-            first: this.props.queryString.f,
-            after: this.props.queryString.a,
-            last: this.props.queryString.l,
-            before: this.props.queryString.b
-          }
-        });
-
-        const newResult = {
-          ...this.state.data,
-          posts: response.data.posts
-        };
-
-        this.setState({ data: newResult });
-      } catch (error) {
-        this.setState({ error: error });
-      }
-
-      this.props.hideLoading();
-      this.setState({ loading: false });
+      this.fetchSubReddit();
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.fetchSubReddit();
+  }
+
+  fetchSubReddit = async () => {
     this.props.showLoading();
     this.setState({ loading: true });
     const { query } = this.props.client;
@@ -123,14 +99,19 @@ class SubReddit extends Component {
         }
       });
 
-      this.setState({ data: response.data });
+      const newResult = {
+        ...this.state.data,
+        posts: response.data.posts
+      };
+
+      this.setState({ data: newResult });
     } catch (error) {
       this.setState({ error: error });
     }
 
     this.props.hideLoading();
     this.setState({ loading: false });
-  }
+  };
 
   onClickNextPage = () => {
     const { posts } = this.state.data;

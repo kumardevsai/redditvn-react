@@ -41,43 +41,8 @@ export const searchReducer = (state = searchInitialState, action) => {
   }
 };
 
-// stats
-const statsInitialState = {
-  chart: {},
-  top: {},
-  users: [],
-  error: undefined
-};
-export const statsReducer = (state = statsInitialState, action) => {
-  switch (action.type) {
-    case types.STATS_STATISTICS__RECEIVE_CHART:
-      return {
-        ...state,
-        chart: action.chart,
-        error: undefined
-      };
-
-    case types.STATS_TOP__RECEIVE_LIST:
-      return {
-        ...state,
-        top: action.top,
-        error: undefined
-      };
-
-    case types.STATS__ERROR:
-      return {
-        ...state,
-        error: action.error
-      };
-
-    default:
-      return state;
-  }
-};
-
 //combineReducers
 export default {
   main: mainReducer,
   search: searchReducer,
-  stats: statsReducer
 };

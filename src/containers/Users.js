@@ -55,43 +55,19 @@ class Users extends Component {
     return true;
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
-      this.props.showLoading();
-      this.setState({ loading: true });
-      const { query } = this.props.client;
-
-      try {
-        const response = await query({
-          query: getUsers,
-          variables: {
-            query: this.props.queryString.q,
-            first: this.props.queryString.f,
-            after: this.props.queryString.a,
-            last: this.props.queryString.l,
-            before: this.props.queryString.b
-          }
-        });
-
-        const newResult = {
-          ...this.state.data,
-          users: response.data.users
-        };
-
-        this.setState({ data: newResult });
-      } catch (error) {
-        this.setState({ error: error });
-      }
-
-      this.props.hideLoading();
-      this.setState({ loading: false });
+      this.fetchUsers();
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.fetchUsers();
+  }
+
+  fetchUsers = async () => {
     this.props.showLoading();
     this.setState({ loading: true });
-
     const { query } = this.props.client;
 
     try {
@@ -106,14 +82,19 @@ class Users extends Component {
         }
       });
 
-      this.setState({ data: response.data });
+      const newResult = {
+        ...this.state.data,
+        users: response.data.users
+      };
+
+      this.setState({ data: newResult });
     } catch (error) {
       this.setState({ error: error });
     }
 
     this.props.hideLoading();
     this.setState({ loading: false });
-  }
+  };
 
   onClickNextPage = () => {
     const { users } = this.state.data;
@@ -179,13 +160,7 @@ class Users extends Component {
                   <tr key={value.node._id}>
                     <td>
                       <Link to={`/user/${value.node._id}`} className="d-inline-block mr-2">
-                        <LazyImage
-                          className="rounded-circle fb-avatar"
-                          src={`https://graph.facebook.com/${value.node._id}/picture?width=32`}
-                          alt={value.node.name}
-                          height="2rem"
-                          width="2rem"
-                        />
+                        <LazyImage className="rounded-circle fb-avatar" src={value.node.profile_pic} alt={value.node.name} height="2rem" width="2rem" />
                       </Link>
                       <Link to={`/user/${value.node._id}`}>{value.node.name}</Link>
                     </td>

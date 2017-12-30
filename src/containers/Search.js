@@ -64,45 +64,20 @@ class Search extends Component {
     return true;
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
-      this.props.showLoading();
-      this.setState({ loading: true });
-      this.props.setSearch(this.props.queryString.q);
-      const { query } = this.props.client;
-
-      try {
-        const response = await query({
-          query: getPosts,
-          variables: {
-            query: this.props.queryString.q,
-            first: this.props.queryString.f,
-            after: this.props.queryString.a,
-            last: this.props.queryString.l,
-            before: this.props.queryString.b
-          }
-        });
-
-        const newResult = {
-          ...this.state.data,
-          posts: response.data.posts
-        };
-
-        this.setState({ data: newResult });
-      } catch (error) {
-        this.setState({ error: error });
-      }
-
-      this.props.hideLoading();
-      this.setState({ loading: false });
+      this.fetchPosts();
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.fetchPosts();
+  }
+
+  fetchPosts = async () => {
     this.props.showLoading();
     this.setState({ loading: true });
     this.props.setSearch(this.props.queryString.q);
-
     const { query } = this.props.client;
 
     try {
@@ -117,14 +92,19 @@ class Search extends Component {
         }
       });
 
-      this.setState({ data: response.data });
+      const newResult = {
+        ...this.state.data,
+        posts: response.data.posts
+      };
+
+      this.setState({ data: newResult });
     } catch (error) {
       this.setState({ error: error });
     }
 
     this.props.hideLoading();
     this.setState({ loading: false });
-  }
+  };
 
   onClickNextPage = () => {
     const { posts } = this.state.data;
