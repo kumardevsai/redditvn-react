@@ -13,7 +13,7 @@ const getComments = gql`
   query getComments($post_id: String!, $cursor: String) {
     post(id: $post_id) {
       _id
-      comments(first: 10, after: $cursor) {
+      comments(first: 20, after: $cursor) {
         pageInfo {
           hasNextPage
           hasPreviousPage

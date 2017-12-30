@@ -103,7 +103,7 @@ class SubReddit extends Component {
         ...this.state.data,
         posts: response.data.posts
       };
-
+      if (response.data.r) newResult.r = response.data.r;
       this.setState({ data: newResult });
     } catch (error) {
       this.setState({ error: error });

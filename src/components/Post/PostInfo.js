@@ -24,8 +24,16 @@ class PostInfo extends PureComponent {
 
     return (
       <div className="card-body">
-        {r && <span className="badge badge-pill badge-primary mr-1">r/{r}</span>}
-        {u && <span className="badge badge-pill badge-primary mr-1">u/{u}</span>}
+        {r && (
+          <Link className="badge badge-pill badge-primary mr-1" to={`/r/${r}`}>
+            r/{r}
+          </Link>
+        )}
+        {u && (
+          <Link className="badge badge-pill badge-primary mr-1" to={`/u/${u}`}>
+            u/{u}
+          </Link>
+        )}
         {likesCount > 0 && <span className="badge badge-pill badge-primary mr-1">{likesCount} likes</span>}
         {commentsCount > 0 && showDetail ? (
           <a className="badge badge-pill badge-secondary mr-1" href={`#comment`}>

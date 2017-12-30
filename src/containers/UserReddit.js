@@ -103,6 +103,7 @@ class UserReddit extends Component {
         ...this.state.data,
         posts: response.data.posts
       };
+      if (response.data.u) newResult.u = response.data.u;
       this.setState({ data: newResult });
     } catch (error) {
       this.setState({ error: error });
