@@ -10,33 +10,8 @@ import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
 import { operations } from '../duck';
 import Pagination from '../components/Pagination';
-
+import { getUsers} from '../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const getUsers = gql`
-  query getUsers($query: String, $first: Int, $after: String, $last: Int, $before: String) {
-    users(first: $first, after: $after, last: $last, before: $before, q: $query) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-        totalCount
-      }
-      edges {
-        cursor
-        node {
-          _id
-          name
-          profile_pic
-          posts_count
-          comments_count
-        }
-      }
-    }
-  }
-`;
 
 class Users extends Component {
   constructor(props) {
@@ -187,11 +162,11 @@ class Users extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
-  query.q = query.q || null;
-  query.a = query.a || null;
-  query.b = query.b || null;
+  query.q = query.q || undefined;
+  query.a = query.a || undefined;
+  query.b = query.b || undefined;
   query.f = query.f || 100;
-  query.l = query.l || null;
+  query.l = query.l || undefined;
 
   return {
     queryString: query

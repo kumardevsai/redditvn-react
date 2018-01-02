@@ -3,61 +3,17 @@ import PostContainer from '../components/Post/PostContainer';
 import { connect } from 'react-redux';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
-
+import { getPost} from '../utils/graphqlQuery';
 import { graphql, compose } from 'react-apollo';
 import base64 from 'base-64';
-import gql from 'graphql-tag';
 import _ from 'lodash';
 
-const getPost = gql`
-  query getPost($post_id: String!, $cursor: String) {
-    post(id: $post_id) {
-      _id
-      user {
-        _id
-        name
-        profile_pic
-      }
-      r
-      u
-      message
-      created_time
-      comments_count
-      likes_count
-      is_deleted
-      attachments {
-        edges {
-          node {
-            url
-            src
-            type
-          }
-        }
-      }
-    }
-    prevPost: posts(first: 1, after: $cursor) {
-      edges {
-        node {
-          _id
-        }
-      }
-    }
-    nextPost: posts(last: 1, before: $cursor) {
-      edges {
-        node {
-          _id
-        }
-      }
-    }
-  }
-`;
 class Post extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.postId !== nextProps.postId) {
       this.props.data.refetch({
         post_id: nextProps.postId,
-        cursor: base64.encode(`{"lastId":"${nextProps.postId}"}`),
-        first: null
+        cursor: base64.encode(`{"lastId":"${nextProps.postId}"}`)
       });
     }
   }
@@ -101,9 +57,8 @@ export default compose(
   graphql(getPost, {
     options: props => ({
       variables: {
-        post_id: props.postId,
-        cursor: base64.encode(`{"lastId":"${props.postId}"}`),
-        first: null
+        post_id: base64.encode(`Post:${props.postId}`),
+        cursor: base64.encode(`{"id":"${props.postId}"}`)
       }
     })
   })

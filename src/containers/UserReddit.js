@@ -10,47 +10,8 @@ import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
 import { operations } from '../duck';
-
+import { getPostsWithUserReddit } from '../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const getPostsWithUserReddit = gql`
-  query getPostsWithUserReddit($name: String!, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
-    u(name: $name) {
-      comment_karma
-      icon_img
-      link_karma
-      name
-    }
-    posts(first: $first, after: $after, last: $last, before: $before, u: $ureddit) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-        totalCount
-      }
-      edges {
-        cursor
-        node {
-          _id
-          user {
-            _id
-            name
-            profile_pic
-          }
-          r
-          u
-          message
-          created_time
-          comments_count
-          likes_count
-          is_deleted
-        }
-      }
-    }
-  }
-`;
 
 class UserReddit extends Component {
   constructor(props) {
@@ -191,10 +152,10 @@ class UserReddit extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
-  query.a = query.a || null;
-  query.b = query.b || null;
+  query.a = query.a || undefined;
+  query.b = query.b || undefined;
   query.f = query.f || 10;
-  query.l = query.l || null;
+  query.l = query.l || undefined;
 
   return {
     queryString: query,

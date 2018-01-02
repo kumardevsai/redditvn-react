@@ -13,133 +13,9 @@ import PostCommentDetail from '../components/Post/PostCommentDetail';
 import _ from 'lodash';
 import classNames from 'classnames';
 import { operations } from '../duck';
-
+import { getUser, getUserPosts, getUserComments } from '../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const getUser = gql`
-  query getUser(
-    $user_id: String!
-    $post_first: Int
-    $post_after: String
-    $post_last: Int
-    $post_before: String
-    $comment_first: Int
-    $comment_after: String
-    $comment_last: Int
-    $comment_before: String
-  ) {
-    user(id: $user_id) {
-      _id
-      name
-      profile_pic(size: 128)
-      posts_count
-      comments_count
-      posts(first: $post_first, after: $post_after, last: $post_last, before: $post_before) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-        }
-        edges {
-          cursor
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            r
-            u
-            message
-            created_time
-            comments_count
-            likes_count
-            is_deleted
-          }
-        }
-      }
-      comments(first: $comment_first, after: $comment_after, last: $comment_last, before: $comment_before) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-        }
-        edges {
-          cursor
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            message
-            created_time
-          }
-        }
-      }
-    }
-  }
-`;
-
-const getUserPosts = gql`
-  query getUser($user_id: String!, $post_first: Int, $post_after: String, $post_last: Int, $post_before: String) {
-    user(id: $user_id) {
-      _id
-      posts(first: $post_first, after: $post_after, last: $post_last, before: $post_before) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-        }
-        edges {
-          cursor
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            r
-            u
-            message
-            created_time
-            comments_count
-            likes_count
-            is_deleted
-          }
-        }
-      }
-    }
-  }
-`;
-
-const getUserComments = gql`
-  query getUser($user_id: String!, $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String) {
-    user(id: $user_id) {
-      _id
-      comments(first: $comment_first, after: $comment_after, last: $comment_last, before: $comment_before) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-        }
-        edges {
-          cursor
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            message
-            created_time
-          }
-        }
-      }
-    }
-  }
-`;
+import base64 from 'base-64';
 
 class User extends Component {
   constructor(props) {
@@ -187,7 +63,7 @@ class User extends Component {
       const response = await query({
         query: getUser,
         variables: {
-          user_id: this.props.userId,
+          user_id: base64.encode(`User:${this.props.userId}`),
           post_first: this.props.queryString.pf,
           post_after: this.props.queryString.pa,
           post_last: this.props.queryString.pl,
@@ -216,7 +92,7 @@ class User extends Component {
       const response = await query({
         query: getUserPosts,
         variables: {
-          user_id: this.props.userId,
+          user_id: base64.encode(`User:${this.props.userId}`),
           post_first: this.props.queryString.pf,
           post_after: this.props.queryString.pa,
           post_last: this.props.queryString.pl,
@@ -249,7 +125,7 @@ class User extends Component {
       const response = await query({
         query: getUserComments,
         variables: {
-          user_id: this.props.userId,
+          user_id: base64.encode(`User:${this.props.userId}`),
           comment_first: this.props.queryString.cf,
           comment_after: this.props.queryString.ca,
           comment_last: this.props.queryString.cl,
@@ -438,13 +314,19 @@ const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
   query.pa = query.pa || null;
   query.pb = query.pb || null;
-  query.pf = query.pf || 10;
-  query.pl = query.pl || null;
+  if (!query.pf && !query.pl) {
+    query.pf = 10;
+  };
+  if (query.pf) query.pl = null;
+  if (query.pl) query.pf = null;
 
   query.ca = query.ca || null;
   query.cb = query.cb || null;
-  query.cf = query.cf || 30;
-  query.cl = query.cl || null;
+  if (!query.cf && !query.cl) {
+    query.cf = 30;
+  }
+  if (query.cf) query.cl = null;
+  if (query.cl) query.cf = null;
 
   return {
     queryString: query,

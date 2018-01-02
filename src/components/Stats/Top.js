@@ -10,52 +10,8 @@ import { operations } from '../../duck';
 import querystring from 'querystring';
 import ErrorMessage from '../../components/ErrorMessage';
 import Spinner from 'react-spinkit';
-
+import { getTop } from '../../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const getTop = gql`
-  query getTop($first: Int, $since: Int, $until: Int) {
-    top {
-      posts_count(first: $first, since: $since, until: $until) {
-        edges {
-          node {
-            _id
-            name
-            profile_pic
-            posts_count
-          }
-        }
-      }
-      likes(first: $first, since: $since, until: $until) {
-        edges {
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            likes_count
-          }
-        }
-      }
-      comments(first: $first, since: $since, until: $until) {
-        edges {
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            comments_count
-          }
-        }
-      }
-    }
-  }
-`;
 
 class Top extends Component {
   constructor(props) {

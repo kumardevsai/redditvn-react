@@ -4,52 +4,10 @@ import PostCommentDetail from './PostCommentDetail';
 import PropTypes from 'prop-types';
 import ErrorMessage from '../ErrorMessage';
 import Spinner from 'react-spinkit';
-
+import { getComments} from '../../utils/graphqlQuery';
 import { graphql, compose } from 'react-apollo';
-import gql from 'graphql-tag';
 import _ from 'lodash';
-
-const getComments = gql`
-  query getComments($post_id: String!, $cursor: String) {
-    post(id: $post_id) {
-      _id
-      comments(first: 20, after: $cursor) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-          endCursor
-        }
-        edges {
-          cursor
-          node {
-            _id
-            message
-            created_time
-            user {
-              _id
-              name
-              profile_pic
-            }
-            replies {
-              edges {
-                node {
-                  _id
-                  message
-                  created_time
-                  user {
-                    _id
-                    name
-                    profile_pic
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+import base64 from 'base-64';
 
 class PostComment extends Component {
   constructor(props) {
@@ -70,7 +28,7 @@ class PostComment extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const hasNextPage = _.get(nextProps, 'data.post.comments.pageInfo.hasNextPage', undefined);
+    const hasNextPage = _.get(nextProps, 'data.node.comments.pageInfo.hasNextPage', undefined);
     if (hasNextPage === false) {
       this.setState({ show_button_more: false });
     }
@@ -84,25 +42,24 @@ class PostComment extends Component {
   }
 
   onClickShowComments = () => {
-    const { postId, data: { fetchMore, post } } = this.props;
+    const { postId, data: { fetchMore, node } } = this.props;
 
-    const endCursor = _.get(post, 'comments.pageInfo.endCursor', undefined);
+    const endCursor = _.get(node, 'comments.pageInfo.endCursor', undefined);
 
     fetchMore({
       query: getComments,
       variables: {
-        post_id: postId,
+        post_id: base64.encode(`Post:${postId}`),
         cursor: endCursor
       },
       updateQuery: (previousResult, { fetchMoreResult, queryVariables }) => {
-        const edges = [...previousResult.post.comments.edges, ...fetchMoreResult.post.comments.edges];
         const newResult = {
           ...previousResult,
-          post: {
-            ...previousResult.post,
+          node: {
+            ...previousResult.node,
             comments: {
-              edges: edges,
-              pageInfo: fetchMoreResult.post.comments.pageInfo
+              edges: [...previousResult.node.comments.edges, ...fetchMoreResult.node.comments.edges],
+              pageInfo: fetchMoreResult.node.comments.pageInfo
             }
           }
         };
@@ -112,7 +69,7 @@ class PostComment extends Component {
   };
 
   render() {
-    const { opId, data: { loading, error, post } } = this.props;
+    const { opId, data: { loading, error, node } } = this.props;
     const { show_button_more } = this.state;
 
     if (error) {
@@ -121,7 +78,7 @@ class PostComment extends Component {
 
     return (
       <div className="card-body" id="comment">
-        {post && post.comments && <PostCommentDetail opId={opId} comments={post.comments} />}
+        {node && node.comments && <PostCommentDetail opId={opId} comments={node.comments} />}
         {loading ? (
           <Spinner name="three-bounce" />
         ) : (
@@ -140,7 +97,7 @@ export default compose(
   graphql(getComments, {
     options: props => ({
       variables: {
-        post_id: props.postId,
+        post_id: base64.encode(`Post:${props.postId}`),
         cursor: null
       },
       notifyOnNetworkStatusChange: true

@@ -7,18 +7,8 @@ import deepEqual from 'deep-equal';
 import { operations } from '../../duck';
 import url from 'url';
 import querystring from 'querystring';
-
+import { getChart } from '../../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const getChart = gql`
-  query getChart($type: ChartType!, $group: ChartGroup!) {
-    chart(type: $type, group: $group) {
-      label
-      data
-    }
-  }
-`;
 
 class Statistics extends Component {
   constructor(props) {

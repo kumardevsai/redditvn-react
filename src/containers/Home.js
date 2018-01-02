@@ -4,25 +4,8 @@ import { push } from 'react-router-redux';
 import { operations } from '../duck';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
-
+import { getCount, getRandom} from '../utils/graphqlQuery';
 import { graphql, withApollo, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const getRandom = gql`
-  query getRandom($q: String) {
-    random(q: $q) {
-      _id
-    }
-  }
-`;
-
-const getCount = gql`
-  query getCount {
-    usersCount: count(type: USERS)
-    postsCount: count(type: POSTS)
-    commentsCount: count(type: COMMENTS)
-  }
-`;
 
 class Home extends Component {
   constructor(props) {

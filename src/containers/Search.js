@@ -9,41 +9,8 @@ import PostContainer from '../components/Post/PostContainer';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
 import Pagination from '../components/Pagination';
-
+import { getPosts } from '../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const getPosts = gql`
-  query getPosts($query: String, $first: Int, $after: String, $last: Int, $before: String) {
-    posts(first: $first, after: $after, last: $last, before: $before, q: $query) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-        totalCount
-      }
-      edges {
-        cursor
-        node {
-          _id
-          user {
-            _id
-            name
-            profile_pic
-          }
-          r
-          u
-          message
-          created_time
-          comments_count
-          likes_count
-          is_deleted
-        }
-      }
-    }
-  }
-`;
 
 class Search extends Component {
   constructor(props) {
@@ -146,7 +113,7 @@ class Search extends Component {
     return (
       <div>
         <div className="alert alert-primary" role="alert">
-          Tìm thấy {posts.pageInfo.totalCount} bài viết có từ khóa '{this.props.query}'
+          Tìm thấy {posts.totalCount} bài viết có từ khóa '{this.props.query}'
         </div>
 
         <div className="nav justify-content-end">
@@ -176,10 +143,10 @@ class Search extends Component {
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
   query.q = query.q || '';
-  query.a = query.a || null;
-  query.b = query.b || null;
+  query.a = query.a || undefined;
+  query.b = query.b || undefined;
   query.f = query.f || 10;
-  query.l = query.l || null;
+  query.l = query.l || undefined;
 
   return {
     queryString: query,
