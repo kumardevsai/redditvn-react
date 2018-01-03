@@ -10,7 +10,6 @@ import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
 import PostCommentDetail from '../components/Post/PostCommentDetail';
-import _ from 'lodash';
 import classNames from 'classnames';
 import { operations } from '../duck';
 import { getUser, getUserPosts, getUserComments } from '../utils/graphqlQuery';
@@ -153,7 +152,7 @@ class User extends Component {
   onClickNextPagePost = () => {
     const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
-    newQueryString.pa = _.last(user.posts.edges).cursor;
+    newQueryString.pa = user.posts.pageInfo.endCursor
     newQueryString.pb = null;
     newQueryString.pf = 10;
     newQueryString.pl = null;
@@ -165,7 +164,7 @@ class User extends Component {
     const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.pa = null;
-    newQueryString.pb = _.first(user.posts.edges).cursor;
+    newQueryString.pb = user.posts.pageInfo.startCursor
     newQueryString.pf = null;
     newQueryString.pl = 10;
 
@@ -175,7 +174,7 @@ class User extends Component {
   onClickNextPageComment = () => {
     const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
-    newQueryString.ca = _.last(user.comments.edges).cursor;
+    newQueryString.ca = user.comments.pageInfo.endCursor;
     newQueryString.cb = null;
     newQueryString.cf = 30;
     newQueryString.cl = null;
@@ -187,7 +186,7 @@ class User extends Component {
     const { user } = this.state.data;
     const newQueryString = { ...this.props.queryString };
     newQueryString.ca = null;
-    newQueryString.cb = _.first(user.comments.edges).cursor;
+    newQueryString.cb = user.comments.pageInfo.startCursor;
     newQueryString.cf = null;
     newQueryString.cl = 30;
 

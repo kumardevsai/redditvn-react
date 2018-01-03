@@ -267,6 +267,8 @@ export const getUser = gql`
           pageInfo {
             hasNextPage
             hasPreviousPage
+            startCursor
+            endCursor
           }
           edges {
             cursor
@@ -291,6 +293,8 @@ export const getUser = gql`
           pageInfo {
             hasNextPage
             hasPreviousPage
+            startCursor
+            endCursor
           }
           edges {
             cursor
@@ -321,6 +325,8 @@ export const getUserPosts = gql`
           pageInfo {
             hasNextPage
             hasPreviousPage
+            startCursor
+            endCursor
           }
           edges {
             cursor
@@ -357,6 +363,8 @@ export const getUserComments = gql`
           pageInfo {
             hasNextPage
             hasPreviousPage
+            startCursor
+            endCursor
           }
           edges {
             cursor
