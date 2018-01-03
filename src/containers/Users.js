@@ -76,7 +76,7 @@ class Users extends Component {
     const newQueryString = { ...this.props.queryString };
     newQueryString.a = users.pageInfo.endCursor;
     newQueryString.b = null;
-    newQueryString.f = 100;
+    newQueryString.f = 50;
     newQueryString.l = null;
 
     this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
@@ -88,7 +88,7 @@ class Users extends Component {
     newQueryString.a = null;
     newQueryString.b = users.pageInfo.startCursor;
     newQueryString.f = null;
-    newQueryString.l = 100;
+    newQueryString.l = 50;
 
     this.props.push(this.props.location.pathname + '?' + querystring.stringify(newQueryString));
   };
@@ -116,7 +116,7 @@ class Users extends Component {
         </div>
 
         <div className="card mb-3">
-          <h5 className="card-header">The ranking of {users.pageInfo.totalCount} RedditVN members</h5>
+          <h5 className="card-header">The ranking of {users.totalCount} RedditVN members</h5>
           <table className="table table-hover table-bordered">
             <thead>
               <tr>
@@ -162,11 +162,14 @@ class Users extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
-  query.q = query.q || undefined;
-  query.a = query.a || undefined;
-  query.b = query.b || undefined;
-  query.f = query.f || 100;
-  query.l = query.l || undefined;
+  query.q = query.q || null;
+  query.a = query.a || null;
+  query.b = query.b || null;
+  if (!query.f && !query.l) {
+    query.f = 50;
+  };
+  if (query.f) query.l = null;
+  if (query.l) query.f = null;
 
   return {
     queryString: query

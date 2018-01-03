@@ -3,6 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { push } from 'react-router-redux';
+import querystring from 'querystring';
+import { operations } from '../duck';
 
 class Nav extends Component {
   constructor(props) {
@@ -18,7 +20,15 @@ class Nav extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
-    this.props.push(`/search?q=${encodeURIComponent(this.state.query)}`);
+    const q = this.state.query;
+    const pathname = this.props.location.pathname;
+    this.props.setSearch(q);
+
+    if (pathname === '/users') return this.props.push(pathname + '?' + querystring.stringify({ q }));
+    if (pathname.startsWith('/user/')) return this.props.push(pathname + '?' + querystring.stringify({ q }));
+    if (pathname.startsWith('/r/')) return this.props.push(pathname + '?' + querystring.stringify({ q }));
+    if (pathname.startsWith('/u/')) return this.props.push(pathname + '?' + querystring.stringify({ q }));
+    return this.props.push('/search?' + querystring.stringify({ q }));
   };
 
   componentWillReceiveProps(nextProps) {
@@ -28,7 +38,7 @@ class Nav extends Component {
   }
 
   render() {
-    const showSearchBar = this.props.pathname !== '/';
+    const showSearchBar = this.props.location.pathname !== '/';
 
     return (
       <nav className="navbar navbar-expand-md navbar-dark bg-dark mb-4">
@@ -118,12 +128,12 @@ class Nav extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  pathname: ownProps.location.pathname,
   query: state.search.query
 });
 
 export default withRouter(
   connect(mapStateToProps, {
-    push
+    push,
+    setSearch: operations.setSearch
   })(Nav)
 );

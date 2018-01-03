@@ -39,6 +39,9 @@ class User extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (deepEqual(this.props.queryString, prevProps.queryString) === false) {
+      if (this.props.queryString.q !== prevProps.queryString.q) {
+        return this.fetchUser(true);
+      }
       if (this.props.queryString.ca !== prevProps.queryString.ca || this.props.queryString.cb !== prevProps.queryString.cb) {
         this.fetchUserComments();
       }
@@ -53,24 +56,34 @@ class User extends Component {
     this.fetchUser();
   }
 
-  fetchUser = async () => {
+  fetchUser = async (force = false) => {
     this.props.showLoading();
     this.setState({ loading: true });
     const { query } = this.props.client;
+
+    const { queryString } = this.props;
+    if (force) {
+      queryString.pf = 10;
+      queryString.pa = queryString.pb = queryString.pl = null;
+      queryString.cf = 30;
+      queryString.ca = queryString.cb = queryString.cl = null;
+    }
 
     try {
       const response = await query({
         query: getUser,
         variables: {
-          user_id: base64.encode(`User:${this.props.userId}`),
-          post_first: this.props.queryString.pf,
-          post_after: this.props.queryString.pa,
-          post_last: this.props.queryString.pl,
-          post_before: this.props.queryString.pb,
-          comment_first: this.props.queryString.cf,
-          comment_after: this.props.queryString.ca,
-          comment_last: this.props.queryString.cl,
-          comment_before: this.props.queryString.cb
+          node_id: base64.encode(`User:${this.props.userId}`),
+          user_id: this.props.userId,
+          query: queryString.q,
+          post_first: queryString.pf,
+          post_after: queryString.pa,
+          post_last: queryString.pl,
+          post_before: queryString.pb,
+          comment_first: queryString.cf,
+          comment_after: queryString.ca,
+          comment_last: queryString.cl,
+          comment_before: queryString.cb
         }
       });
 
@@ -91,7 +104,9 @@ class User extends Component {
       const response = await query({
         query: getUserPosts,
         variables: {
-          user_id: base64.encode(`User:${this.props.userId}`),
+          node_id: base64.encode(`User:${this.props.userId}`),
+          user_id: this.props.userId,
+          query: this.props.queryString.q,
           post_first: this.props.queryString.pf,
           post_after: this.props.queryString.pa,
           post_last: this.props.queryString.pl,
@@ -124,7 +139,9 @@ class User extends Component {
       const response = await query({
         query: getUserComments,
         variables: {
-          user_id: base64.encode(`User:${this.props.userId}`),
+          node_id: base64.encode(`User:${this.props.userId}`),
+          user_id: this.props.userId,
+          query: this.props.queryString.q,
           comment_first: this.props.queryString.cf,
           comment_after: this.props.queryString.ca,
           comment_last: this.props.queryString.cl,
@@ -228,14 +245,14 @@ class User extends Component {
             <li className="nav-item">
               <a className={classNames('nav-link', 'active')} data-toggle="tab" href="#posts" role="tab">
                 Posts
-                <span className="badge badge-secondary badge-pill ml-2">{user.posts_count}</span>
+                <span className="badge badge-secondary badge-pill ml-2">{user.posts.totalCount}</span>
               </a>
             </li>
 
             <li className="nav-item">
               <a className={classNames('nav-link', { active: this.props.queryString.show === 'comments' })} data-toggle="tab" href="#comments" role="tab">
                 Comments
-                <span className="badge badge-secondary badge-pill ml-2">{user.comments_count}</span>
+                <span className="badge badge-secondary badge-pill ml-2">{user.comments.totalCount}</span>
               </a>
             </li>
           </ul>
@@ -247,7 +264,7 @@ class User extends Component {
               <Spinner name="three-bounce" />
             ) : (
               user.posts &&
-              user.posts.edges && (
+              user.posts.edges.length > 0 && (
                 <div>
                   <div className="nav justify-content-end">
                     <Pagination
@@ -276,7 +293,7 @@ class User extends Component {
               <Spinner name="three-bounce" />
             ) : (
               user.comments &&
-              user.comments.edges && (
+              user.comments.edges.length > 0 && (
                 <div>
                   <div className="nav justify-content-end">
                     <Pagination
@@ -311,6 +328,7 @@ class User extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
+  query.q = query.q || null;
   query.pa = query.pa || null;
   query.pb = query.pb || null;
   if (!query.pf && !query.pl) {

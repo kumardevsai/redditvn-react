@@ -158,7 +158,7 @@ export const getPosts = gql`
 `;
 
 export const getPostsWithSubReddit = gql`
-  query getPostsWithSubReddit($displayName: ID!, $subreddit: String, $first: Int, $after: String, $last: Int, $before: String) {
+  query getPostsWithSubReddit($displayName: ID!, $query: String, $subreddit: String, $first: Int, $after: String, $last: Int, $before: String) {
     r: node(id: $displayName) {
       id
       ... on R {
@@ -168,7 +168,7 @@ export const getPostsWithSubReddit = gql`
         subscribers
       }
     }
-    posts(first: $first, after: $after, last: $last, before: $before, filter: { r: $subreddit }) {
+    posts(first: $first, after: $after, last: $last, before: $before, filter: { r: $subreddit, q: $query }) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -245,17 +245,11 @@ export const getTop = gql`
 
 export const getUser = gql`
   query getUser(
-    $user_id: ID!
-    $post_first: Int
-    $post_after: String
-    $post_last: Int
-    $post_before: String
-    $comment_first: Int
-    $comment_after: String
-    $comment_last: Int
-    $comment_before: String
+    $node_id: ID!, $user_id: String, $query: String
+    $post_first: Int, $post_after: String, $post_last: Int, $post_before: String
+    $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String
   ) {
-    user: node(id: $user_id) {
+    user: node(id: $node_id) {
       id
       ... on User {
         _id
@@ -263,13 +257,14 @@ export const getUser = gql`
         profile_pic(size: 128)
         posts_count
         comments_count
-        posts(first: $post_first, after: $post_after, last: $post_last, before: $post_before) {
+        posts(first: $post_first, after: $post_after, last: $post_last, before: $post_before, filter: { q: $query, user: $user_id }) {
           pageInfo {
             hasNextPage
             hasPreviousPage
             startCursor
             endCursor
           }
+          totalCount
           edges {
             cursor
             node {
@@ -289,13 +284,14 @@ export const getUser = gql`
             }
           }
         }
-        comments(first: $comment_first, after: $comment_after, last: $comment_last, before: $comment_before) {
+        comments(first: $comment_first, after: $comment_after, last: $comment_last, before: $comment_before, filter: { q: $query, user: $user_id }) {
           pageInfo {
             hasNextPage
             hasPreviousPage
             startCursor
             endCursor
           }
+          totalCount
           edges {
             cursor
             node {
@@ -316,18 +312,19 @@ export const getUser = gql`
 `;
 
 export const getUserPosts = gql`
-  query getUser($user_id: ID!, $post_first: Int, $post_after: String, $post_last: Int, $post_before: String) {
-    user: node(id: $user_id) {
+  query getUser($node_id: ID!, $user_id: String, $query: String, $post_first: Int, $post_after: String, $post_last: Int, $post_before: String) {
+    user: node(id: $node_id) {
       id
       ... on User {
         _id
-        posts(first: $post_first, after: $post_after, last: $post_last, before: $post_before) {
+        posts(first: $post_first, after: $post_after, last: $post_last, before: $post_before, filter: { q: $query, user: $user_id }) {
           pageInfo {
             hasNextPage
             hasPreviousPage
             startCursor
             endCursor
           }
+          totalCount
           edges {
             cursor
             node {
@@ -354,18 +351,19 @@ export const getUserPosts = gql`
 `;
 
 export const getUserComments = gql`
-  query getUser($user_id: ID!, $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String) {
-    user: node(id: $user_id) {
+  query getUser($node_id: ID!, $user_id: String, $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String) {
+    user: node(id: $node_id) {
       id
       ... on User {
         _id
-        comments(first: $comment_first, after: $comment_after, last: $comment_last, before: $comment_before) {
+        comments(first: $comment_first, after: $comment_after, last: $comment_last, before: $comment_before, filter: { q: $query, user: $user_id }) {
           pageInfo {
             hasNextPage
             hasPreviousPage
             startCursor
             endCursor
           }
+          totalCount
           edges {
             cursor
             node {
@@ -386,7 +384,7 @@ export const getUserComments = gql`
 `;
 
 export const getPostsWithUserReddit = gql`
-  query getPostsWithUserReddit($name: ID!, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
+  query getPostsWithUserReddit($name: ID!, $query: String, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
     u: node(id: $name) {
       id
       ... on U {
@@ -396,7 +394,7 @@ export const getPostsWithUserReddit = gql`
         name
       }
     }
-    posts(first: $first, after: $after, last: $last, before: $before, filter: { u: $ureddit }) {
+    posts(first: $first, after: $after, last: $last, before: $before, filter: { u: $ureddit, q: $query }) {
       pageInfo {
         hasNextPage
         hasPreviousPage

@@ -53,7 +53,12 @@ class Home extends Component {
   onSubmitForm = e => {
     e.preventDefault();
     const r = this.state.subreddit !== defaultSubReddit ? this.state.subreddit : '';
-    this.props.push(`/search?r=${r}&q=${encodeURIComponent(this.state.query)}`);
+    if (r) {
+      this.props.push(`/r/${r}?q=${encodeURIComponent(this.state.query)}`);
+    }
+    else {
+      this.props.push(`/search?q=${encodeURIComponent(this.state.query)}`);
+    }
   };
 
   componentDidMount() {

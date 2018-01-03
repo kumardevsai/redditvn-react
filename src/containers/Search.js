@@ -114,28 +114,33 @@ class Search extends Component {
     return (
       <div>
         <div className="alert alert-primary" role="alert">
-          Tìm thấy {posts.totalCount} bài viết có từ khóa '{this.props.query}'
+          Tìm thấy {posts.totalCount} bài viết có từ khóa '{this.props.queryString.q}'
         </div>
 
-        <div className="nav justify-content-end">
-          <Pagination
-            hasNextPage={posts.pageInfo.hasNextPage}
-            hasPreviousPage={posts.pageInfo.hasPreviousPage}
-            onClickNextPage={this.onClickNextPage}
-            onClickPreviousPage={this.onClickPreviousPage}
-          />
-        </div>
+        {posts &&
+          posts.edges.length > 0 && (
+            <div>
+              <div className="nav justify-content-end">
+                <Pagination
+                  hasNextPage={posts.pageInfo.hasNextPage}
+                  hasPreviousPage={posts.pageInfo.hasPreviousPage}
+                  onClickNextPage={this.onClickNextPage}
+                  onClickPreviousPage={this.onClickPreviousPage}
+                />
+              </div>
 
-        <div className="blog-main">{posts.edges && posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
+              <div className="blog-main">{posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
 
-        <div className="nav justify-content-end">
-          <Pagination
-            hasNextPage={posts.pageInfo.hasNextPage}
-            hasPreviousPage={posts.pageInfo.hasPreviousPage}
-            onClickNextPage={this.onClickNextPage}
-            onClickPreviousPage={this.onClickPreviousPage}
-          />
-        </div>
+              <div className="nav justify-content-end">
+                <Pagination
+                  hasNextPage={posts.pageInfo.hasNextPage}
+                  hasPreviousPage={posts.pageInfo.hasPreviousPage}
+                  onClickNextPage={this.onClickNextPage}
+                  onClickPreviousPage={this.onClickPreviousPage}
+                />
+              </div>
+            </div>
+          )}
       </div>
     );
   }
@@ -145,10 +150,13 @@ const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
   query.q = query.q || '';
   query.r = query.r || '';
-  query.a = query.a || undefined;
-  query.b = query.b || undefined;
-  query.f = query.f || 10;
-  query.l = query.l || undefined;
+  query.a = query.a || null;
+  query.b = query.b || null;
+  if (!query.f && !query.l) {
+    query.f = 10;
+  }
+  if (query.f) query.l = null;
+  if (query.l) query.f = null;
 
   return {
     queryString: query,

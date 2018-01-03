@@ -54,6 +54,7 @@ class SubReddit extends Component {
         variables: {
           displayName: base64.encode(`R:${this.props.subreddit}`),
           subreddit: this.props.subreddit,
+          query: this.props.queryString.q,
           first: this.props.queryString.f,
           after: this.props.queryString.a,
           last: this.props.queryString.l,
@@ -123,29 +124,34 @@ class SubReddit extends Component {
           </div>
         )}
 
-        {posts && (
-          <div>
-            <div className="nav justify-content-end">
-              <Pagination
-                hasNextPage={posts.pageInfo.hasNextPage}
-                hasPreviousPage={posts.pageInfo.hasPreviousPage}
-                onClickNextPage={this.onClickNextPage}
-                onClickPreviousPage={this.onClickPreviousPage}
-              />
-            </div>
+        <div className="alert alert-primary" role="alert">
+          Tìm thấy {posts.totalCount} bài viết có từ khóa '{this.props.queryString.q}'
+        </div>
 
-            <div className="blog-main">{posts.edges && posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
+        {posts &&
+          posts.edges.length > 0 && (
+            <div>
+              <div className="nav justify-content-end">
+                <Pagination
+                  hasNextPage={posts.pageInfo.hasNextPage}
+                  hasPreviousPage={posts.pageInfo.hasPreviousPage}
+                  onClickNextPage={this.onClickNextPage}
+                  onClickPreviousPage={this.onClickPreviousPage}
+                />
+              </div>
 
-            <div className="nav justify-content-end">
-              <Pagination
-                hasNextPage={posts.pageInfo.hasNextPage}
-                hasPreviousPage={posts.pageInfo.hasPreviousPage}
-                onClickNextPage={this.onClickNextPage}
-                onClickPreviousPage={this.onClickPreviousPage}
-              />
+              <div className="blog-main">{posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
+
+              <div className="nav justify-content-end">
+                <Pagination
+                  hasNextPage={posts.pageInfo.hasNextPage}
+                  hasPreviousPage={posts.pageInfo.hasPreviousPage}
+                  onClickNextPage={this.onClickNextPage}
+                  onClickPreviousPage={this.onClickPreviousPage}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     );
   }
@@ -153,10 +159,14 @@ class SubReddit extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
-  query.a = query.a || undefined;
-  query.b = query.b || undefined;
-  query.f = query.f || 10;
-  query.l = query.l || undefined;
+  query.q = query.q || null;
+  query.a = query.a || null;
+  query.b = query.b || null;
+  if (!query.f && !query.l) {
+    query.f = 10;
+  }
+  if (query.f) query.l = null;
+  if (query.l) query.f = null;
 
   return {
     queryString: query,
