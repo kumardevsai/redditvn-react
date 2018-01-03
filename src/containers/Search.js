@@ -52,6 +52,7 @@ class Search extends Component {
         query: getPosts,
         variables: {
           query: this.props.queryString.q,
+          subreddit: this.props.queryString.r,
           first: this.props.queryString.f,
           after: this.props.queryString.a,
           last: this.props.queryString.l,
@@ -143,6 +144,7 @@ class Search extends Component {
 const mapStateToProps = (state, ownProps) => {
   const query = url.parse(ownProps.location.search, true).query;
   query.q = query.q || '';
+  query.r = query.r || '';
   query.a = query.a || undefined;
   query.b = query.b || undefined;
   query.f = query.f || 10;

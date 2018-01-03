@@ -1,10 +1,8 @@
 import gql from 'graphql-tag';
 
 export const getRandom = gql`
-  query getRandom($q: String) {
-    random(filter: {
-      q: $q
-    }) {
+  query getRandom($q: String, $r: String) {
+    random(filter: { q: $q, r: $r }) {
       id
       _id
     }
@@ -16,6 +14,14 @@ export const getCount = gql`
     usersCount: count(type: USERS)
     postsCount: count(type: POSTS)
     commentsCount: count(type: COMMENTS)
+    subreddits: subreddits(first: 50) {
+      edges {
+        node {
+          _id
+          posts_count
+        }
+      }
+    }
   }
 `;
 
@@ -120,8 +126,8 @@ export const getChart = gql`
 `;
 
 export const getPosts = gql`
-  query getPosts($query: String, $first: Int, $after: String, $last: Int, $before: String) {
-    posts(first: $first, after: $after, last: $last, before: $before, filter: { q: $query }) {
+  query getPosts($query: String, $subreddit: String, $first: Int, $after: String, $last: Int, $before: String) {
+    posts(first: $first, after: $after, last: $last, before: $before, filter: { q: $query, r: $subreddit }) {
       pageInfo {
         hasNextPage
         hasPreviousPage

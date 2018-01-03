@@ -267,8 +267,13 @@ mark {
   }
 }
 
-.dropdown:hover > .dropdown-menu {
+nav.navbar .dropdown:hover > .dropdown-menu {
   display: block;
 }
 
-.dropdown-menu { margin-top: 0 }
+nav.navbar .dropdown-menu { margin-top: 0 }
+
+.dropdown-menu-subreddit {
+  max-height: 200px;
+  overflow: auto;
+}
