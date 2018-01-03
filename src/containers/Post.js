@@ -12,8 +12,8 @@ class Post extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.postId !== nextProps.postId) {
       this.props.data.refetch({
-        post_id: nextProps.postId,
-        cursor: base64.encode(`{"lastId":"${nextProps.postId}"}`)
+        post_id: base64.encode(`Post:${nextProps.postId}`),
+        cursor: base64.encode(`{"id":"${nextProps.postId}"}`)
       });
     }
   }
