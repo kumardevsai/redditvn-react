@@ -12,6 +12,7 @@ import Spinner from 'react-spinkit';
 import { operations } from '../duck';
 import { getPostsWithUserReddit } from '../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
+import base64 from 'base-64';
 
 class UserReddit extends Component {
   constructor(props) {
@@ -51,7 +52,7 @@ class UserReddit extends Component {
       const response = await query({
         query: getPostsWithUserReddit,
         variables: {
-          name: this.props.ureddit,
+          name: base64.encode(`U:${this.props.ureddit}`),
           ureddit: this.props.ureddit,
           first: this.props.queryString.f,
           after: this.props.queryString.a,

@@ -10,6 +10,7 @@ import LazyImage from '../components/LazyImage';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
 import { operations } from '../duck';
+import base64 from 'base-64';
 import { getPostsWithSubReddit } from '../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
 
@@ -51,7 +52,7 @@ class SubReddit extends Component {
       const response = await query({
         query: getPostsWithSubReddit,
         variables: {
-          displayName: this.props.subreddit,
+          displayName: base64.encode(`R:${this.props.subreddit}`),
           subreddit: this.props.subreddit,
           first: this.props.queryString.f,
           after: this.props.queryString.a,

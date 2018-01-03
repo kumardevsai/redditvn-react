@@ -107,7 +107,9 @@ class Top extends Component {
 
       const newResult = {
         ...this.state.data,
-        top: response.data.top
+        top: response.data.top,
+        likes: response.data.likes,
+        comments: response.data.comments
       };
 
       this.setState({ data: newResult });
@@ -120,7 +122,7 @@ class Top extends Component {
   };
 
   render() {
-    const { loading, error, data: { top } } = this.state;
+    const { loading, error, data: { top, likes, comments } } = this.state;
 
     if (loading) {
       return <Spinner name="three-bounce" />;
@@ -134,7 +136,7 @@ class Top extends Component {
       return null;
     }
 
-    const { posts_count, likes, comments } = top;
+    const { posts_count } = top;
 
     return (
       <div>

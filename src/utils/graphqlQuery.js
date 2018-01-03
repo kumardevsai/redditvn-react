@@ -152,12 +152,15 @@ export const getPosts = gql`
 `;
 
 export const getPostsWithSubReddit = gql`
-  query getPostsWithSubReddit($displayName: String!, $subreddit: String, $first: Int, $after: String, $last: Int, $before: String) {
-    r(displayName: $displayName) {
-      display_name
-      accounts_active
-      icon_img
-      subscribers
+  query getPostsWithSubReddit($displayName: ID!, $subreddit: String, $first: Int, $after: String, $last: Int, $before: String) {
+    r: node(id: $displayName) {
+      id
+      ... on R {
+        display_name
+        accounts_active
+        icon_img
+        subscribers
+      }
     }
     posts(first: $first, after: $after, last: $last, before: $before, filter: { r: $subreddit }) {
       pageInfo {
@@ -191,6 +194,34 @@ export const getPostsWithSubReddit = gql`
 
 export const getTop = gql`
   query getTop($first: Int, $since: Int, $until: Int) {
+    likes: posts(orderBy: likes_count_DESC, first: $first, filter: { since: $since, until: $until }) {
+      edges {
+        node {
+          _id
+          user {
+            _id
+            name
+            profile_pic
+          }
+          likes_count
+        }
+      }
+    }
+
+    comments: posts(orderBy: comments_count_DESC, first: $first, filter: { since: $since, until: $until }) {
+      edges {
+        node {
+          _id
+          user {
+            _id
+            name
+            profile_pic
+          }
+          comments_count
+        }
+      }
+    }
+
     top {
       posts_count(first: $first, since: $since, until: $until) {
         edges {
@@ -199,32 +230,6 @@ export const getTop = gql`
             name
             profile_pic
             posts_count
-          }
-        }
-      }
-      likes(first: $first, since: $since, until: $until) {
-        edges {
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            likes_count
-          }
-        }
-      }
-      comments(first: $first, since: $since, until: $until) {
-        edges {
-          node {
-            _id
-            user {
-              _id
-              name
-              profile_pic
-            }
-            comments_count
           }
         }
       }
@@ -367,12 +372,15 @@ export const getUserComments = gql`
 `;
 
 export const getPostsWithUserReddit = gql`
-  query getPostsWithUserReddit($name: String!, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
-    u(name: $name) {
-      comment_karma
-      icon_img
-      link_karma
-      name
+  query getPostsWithUserReddit($name: ID!, $ureddit: String, $first: Int, $after: String, $last: Int, $before: String) {
+    u: node(id: $name) {
+      id
+      ... on U {
+        comment_karma
+        icon_img
+        link_karma
+        name
+      }
     }
     posts(first: $first, after: $after, last: $last, before: $before, filter: { u: $ureddit }) {
       pageInfo {
