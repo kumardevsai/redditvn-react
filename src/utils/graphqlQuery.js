@@ -351,7 +351,7 @@ export const getUserPosts = gql`
 `;
 
 export const getUserComments = gql`
-  query getUser($node_id: ID!, $user_id: String, $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String) {
+  query getUser($node_id: ID!, $user_id: String, $query: String, $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String) {
     user: node(id: $node_id) {
       id
       ... on User {
