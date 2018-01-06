@@ -23,9 +23,13 @@ import NotFound from './NotFound';
 
 import { ApolloProvider } from 'react-apollo';
 import client from '../graphqlClient';
+import ReactGA from 'react-ga';
 
 class App extends Component {
   componentDidMount() {
+    ReactGA.initialize('UA-112002732-1');
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     const ele = document.getElementById('ipl-progress-indicator');
     if (ele) {
       setTimeout(() => {

@@ -312,7 +312,7 @@ export const getUser = gql`
 `;
 
 export const getUserPosts = gql`
-  query getUser($node_id: ID!, $user_id: String, $query: String, $post_first: Int, $post_after: String, $post_last: Int, $post_before: String) {
+  query getUserPosts($node_id: ID!, $user_id: String, $query: String, $post_first: Int, $post_after: String, $post_last: Int, $post_before: String) {
     user: node(id: $node_id) {
       id
       ... on User {
@@ -351,7 +351,7 @@ export const getUserPosts = gql`
 `;
 
 export const getUserComments = gql`
-  query getUser($node_id: ID!, $user_id: String, $query: String, $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String) {
+  query getUserComments($node_id: ID!, $user_id: String, $query: String, $comment_first: Int, $comment_after: String, $comment_last: Int, $comment_before: String) {
     user: node(id: $node_id) {
       id
       ... on User {
