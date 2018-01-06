@@ -24,12 +24,16 @@ import NotFound from './NotFound';
 import { ApolloProvider } from 'react-apollo';
 import client from '../graphqlClient';
 import ReactGA from 'react-ga';
+import Analytics from './Analytics';
+
+ReactGA.initialize('UA-112002732-1');
+
+const AnalyticsTracker = () => {
+  return <Route component={Analytics} />;
+};
 
 class App extends Component {
   componentDidMount() {
-    ReactGA.initialize('UA-112002732-1');
-    ReactGA.pageview(window.location.pathname + window.location.search);
-
     const ele = document.getElementById('ipl-progress-indicator');
     if (ele) {
       setTimeout(() => {
@@ -46,21 +50,21 @@ class App extends Component {
       <ApolloProvider client={client}>
         <Provider store={store}>
           <ConnectedRouter history={history}>
-            <ScrollToTop>
-              <Layout>
-                <Switch>
-                  <Route exact path="/" component={Home} />
-                  <Route exact path="/search" component={Search} />
-                  <Route exact path="/r/:subreddit" component={SubReddit} />
-                  <Route exact path="/u/:ureddit" component={UserReddit} />
-                  <Route exact path="/post/:post_id" component={Post} />
-                  <Route exact path="/user/:user_id" component={User} />
-                  <Route path="/stats" component={Stats} />
-                  <Route path="/users" component={Users} />
-                  <Route component={NotFound} />
-                </Switch>
-              </Layout>
-            </ScrollToTop>
+            <Layout>
+              <ScrollToTop />
+              <AnalyticsTracker />
+              <Switch>
+                <Route exact path="/" component={Home} />
+                <Route exact path="/search" component={Search} />
+                <Route exact path="/r/:subreddit" component={SubReddit} />
+                <Route exact path="/u/:ureddit" component={UserReddit} />
+                <Route exact path="/post/:post_id" component={Post} />
+                <Route exact path="/user/:user_id" component={User} />
+                <Route path="/stats" component={Stats} />
+                <Route path="/users" component={Users} />
+                <Route component={NotFound} />
+              </Switch>
+            </Layout>
           </ConnectedRouter>
         </Provider>
       </ApolloProvider>
