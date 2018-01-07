@@ -4,11 +4,12 @@ import { push } from 'react-router-redux';
 import { operations } from '../duck';
 import ErrorMessage from '../components/ErrorMessage';
 import Spinner from 'react-spinkit';
-import { getCount, getRandom} from '../utils/graphqlQuery';
+import { getCount, getRandom } from '../utils/graphqlQuery';
 import { graphql, withApollo, compose } from 'react-apollo';
 import $ from 'jquery';
+import ReactGA from 'react-ga';
 
-const defaultSubReddit = '--- All subreddit ---';
+const defaultSubReddit = 'All SubReddit';
 
 class Home extends Component {
   constructor(props) {
@@ -29,11 +30,12 @@ class Home extends Component {
 
   onClickRandomPost = async e => {
     e.preventDefault();
+    ReactGA.event({ category: 'User', action: 'Button Random' });
     this.props.showLoading();
 
     const { query } = this.props.client;
     try {
-      const r = (this.state.subreddit !== defaultSubReddit) ? this.state.subreddit : '';
+      const r = this.state.subreddit !== defaultSubReddit ? this.state.subreddit : '';
       const response = await query({
         query: getRandom,
         variables: {
@@ -52,11 +54,11 @@ class Home extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
+    ReactGA.event({ category: 'User', action: 'Button Search Home' });
     const r = this.state.subreddit !== defaultSubReddit ? this.state.subreddit : '';
     if (r) {
       this.props.push(`/r/${r}?q=${encodeURIComponent(this.state.query)}`);
-    }
-    else {
+    } else {
       this.props.push(`/search?q=${encodeURIComponent(this.state.query)}`);
     }
   };
@@ -65,8 +67,11 @@ class Home extends Component {
     let self = this;
     $(function() {
       $('.input-group').on('click', '.dropdown-menu li', function() {
-        const r = $(this).attr('data-value')
-        $(this).closest('.dropdown').find('input.subreddit-id').val(r);
+        const r = $(this).attr('data-value');
+        $(this)
+          .closest('.dropdown')
+          .find('input.subreddit-id')
+          .val(r);
         self.setState({ subreddit: r });
       });
     });
@@ -83,24 +88,29 @@ class Home extends Component {
       <div className="starter-template">
         <form className="pt-5 pb-5" onSubmit={this.onSubmitForm}>
           <div className="form-group row">
+            <div className="col-12 col-md-8 col-lg-9 mb-2 mb-md-0">
+              <input
+                id="searchBox"
+                className="form-control form-control-lg"
+                name="q"
+                onChange={this.onQueryChange}
+                value={this.state.query}
+                placeholder="Search for posts (regex support)"
+                aria-label="Search for posts (regex support)"
+                type="text"
+              />
+            </div>
             <div className="input-group dropdown col-12 col-md-4 col-lg-3">
               <input type="text" className="form-control subreddit-id dropdown-toggle" onChange={this.onSubRedditChange} value={this.state.subreddit} />
               <ul className="dropdown-menu dropdown-menu-right dropdown-menu-subreddit">
-                {data.subreddits && data.subreddits.edges.map(value => (<li key={value.node._id} className="dropdown-item" data-value={value.node._id}>{value.node._id}</li>))}
+                {data.subreddits &&
+                  data.subreddits.edges.map(value => (
+                    <li key={value.node._id} className="dropdown-item" data-value={value.node._id}>
+                      {value.node._id}
+                    </li>
+                  ))}
               </ul>
-              <span role="button" className="input-group-addon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></span>
-            </div>
-            <div className="col-12 col-md-8 col-lg-9">
-            <input
-              id="searchBox"
-              className="form-control form-control-lg"
-              name="q"
-              onChange={this.onQueryChange}
-              value={this.state.query}
-              placeholder="Search for posts (regex support)"
-              aria-label="Search for posts (regex support)"
-              type="text"
-            />
+              <span role="button" className="input-group-addon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" />
             </div>
           </div>
           <div className="form-group">

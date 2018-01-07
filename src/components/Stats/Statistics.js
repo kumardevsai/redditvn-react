@@ -9,6 +9,7 @@ import url from 'url';
 import querystring from 'querystring';
 import { getChart } from '../../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
+import ReactGA from 'react-ga';
 
 class Statistics extends Component {
   constructor(props) {
@@ -32,6 +33,7 @@ class Statistics extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
+    ReactGA.event({ category: 'User', action: 'Button Get Statistics' });
     const newQueryString = {
       ...this.props.queryString,
       type: this.state.type,

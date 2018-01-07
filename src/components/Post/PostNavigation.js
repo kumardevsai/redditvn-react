@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import ReactGA from 'react-ga';
 
 class PostNavigation extends PureComponent {
   static propTypes = {
@@ -13,6 +14,14 @@ class PostNavigation extends PureComponent {
     nextPost: undefined
   };
 
+  onClickNextPost = () => {
+    ReactGA.event({ category: 'User', action: 'Button Next Post' });
+  };
+
+  onClickPreviousPost = () => {
+    ReactGA.event({ category: 'User', action: 'Button Previous Post' });
+  };
+
   render() {
     const { prevPost, nextPost } = this.props;
 
@@ -21,14 +30,14 @@ class PostNavigation extends PureComponent {
         <div className="row">
           {prevPost && (
             <div className="col">
-              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${prevPost._id}`}>
+              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${prevPost._id}`} onClick={this.onClickPreviousPost}>
                 « Prev post
               </Link>
             </div>
           )}
           {nextPost && (
             <div className="col text-right">
-              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${nextPost._id}`}>
+              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${nextPost._id}`} onClick={this.onClickNextPost}>
                 Next post »
               </Link>
             </div>

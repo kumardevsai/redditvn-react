@@ -12,6 +12,7 @@ import ErrorMessage from '../../components/ErrorMessage';
 import Spinner from 'react-spinkit';
 import { getTop } from '../../utils/graphqlQuery';
 import { withApollo, compose } from 'react-apollo';
+import ReactGA from 'react-ga';
 
 class Top extends Component {
   constructor(props) {
@@ -35,6 +36,7 @@ class Top extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
+    ReactGA.event({ category: 'User', action: 'Button Get Top' });
     const newQueryString = {
       ...this.props.queryString,
       limit: this.state.limit,

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import ReactGA from 'react-ga';
 
 class Analytics extends Component {
@@ -17,6 +17,7 @@ class Analytics extends Component {
     const page = pathname + search
     ReactGA.set({page});
     ReactGA.pageview(page);
+    ReactGA.modalview(pathname);
   }
 
   render() {

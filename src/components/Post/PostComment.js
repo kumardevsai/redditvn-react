@@ -8,6 +8,7 @@ import { getComments} from '../../utils/graphqlQuery';
 import { graphql, compose } from 'react-apollo';
 import _ from 'lodash';
 import base64 from 'base-64';
+import ReactGA from 'react-ga';
 
 class PostComment extends Component {
   constructor(props) {
@@ -42,6 +43,7 @@ class PostComment extends Component {
   }
 
   onClickShowComments = () => {
+    ReactGA.event({ category: 'User', action: 'Button Show More Comment' });
     const { postId, data: { fetchMore, node } } = this.props;
 
     const endCursor = _.get(node, 'comments.pageInfo.endCursor', undefined);

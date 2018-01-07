@@ -54,14 +54,14 @@ export const getPost = gql`
         }
       }
     }
-    prevPost: posts(first: 1, after: $cursor) {
+    nextPost: posts(first: 1, after: $cursor) {
       edges {
         node {
           _id
         }
       }
     }
-    nextPost: posts(last: 1, before: $cursor) {
+    prevPost: posts(last: 1, before: $cursor) {
       edges {
         node {
           _id

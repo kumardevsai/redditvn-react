@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import querystring from 'querystring';
 import { operations } from '../duck';
+import ReactGA from 'react-ga';
 
 class Nav extends Component {
   constructor(props) {
@@ -20,6 +21,7 @@ class Nav extends Component {
 
   onSubmitForm = e => {
     e.preventDefault();
+    ReactGA.event({ category: 'User', action: 'Button Search Nav-bar' });
     const q = this.state.query;
     const pathname = this.props.location.pathname;
     this.props.setSearch(q);
