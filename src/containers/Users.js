@@ -132,12 +132,12 @@ class Users extends Component {
             <tbody>
               {users.edges &&
                 users.edges.map(value => (
-                  <tr key={value.node._id}>
+                  <tr key={value.node.raw_id}>
                     <td>
-                      <Link to={`/user/${value.node._id}`} className="d-inline-block mr-2">
+                      <Link to={`/user/${value.node.raw_id}`} className="d-inline-block mr-2">
                         <LazyImage className="rounded-circle fb-avatar" src={value.node.profile_pic} alt={value.node.name} height="2rem" width="2rem" />
                       </Link>
-                      <Link to={`/user/${value.node._id}`}>{value.node.name}</Link>
+                      <Link to={`/user/${value.node.raw_id}`}>{value.node.name}</Link>
                     </td>
                     <td className="text-center">{value.node.posts_count}</td>
                     <td className="text-center">{value.node.comments_count}</td>

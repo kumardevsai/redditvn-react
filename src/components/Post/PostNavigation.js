@@ -30,14 +30,14 @@ class PostNavigation extends PureComponent {
         <div className="row">
           {prevPost && (
             <div className="col">
-              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${prevPost._id}`} onClick={this.onClickPreviousPost}>
+              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${prevPost.raw_id}`} onClick={this.onClickPreviousPost}>
                 « Prev post
               </Link>
             </div>
           )}
           {nextPost && (
             <div className="col text-right">
-              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${nextPost._id}`} onClick={this.onClickNextPost}>
+              <Link className="badge badge-pill badge-secondary mr-1" to={`/post/${nextPost.raw_id}`} onClick={this.onClickNextPost}>
                 Next post »
               </Link>
             </div>

@@ -22,10 +22,10 @@ class PostCommentDetail extends PureComponent {
       <div className="comment-content">
         {comments && comments.edges &&
           comments.edges.map(commentEdge => (
-            <div key={commentEdge.node._id}>
+            <div key={commentEdge.node.raw_id}>
               <div className="row comment mb-2">
                 <div className="col-auto pr-0">
-                  <Link to={`/user/${commentEdge.node.user._id}`}>
+                  <Link to={`/user/${commentEdge.node.user.raw_id}`}>
                     <LazyImage
                       className="rounded-circle fb-avatar"
                       src={commentEdge.node.user.profile_pic}
@@ -37,7 +37,7 @@ class PostCommentDetail extends PureComponent {
                 </div>
                 <div className="col">
                   <span className="cmt-box brko">
-                    <Link className={classNames('mr-1', { 'redditvn-op': opId === commentEdge.node.user._id })} to={`/user/${commentEdge.node.user._id}`}>
+                    <Link className={classNames('mr-1', { 'redditvn-op': opId === commentEdge.node.user.raw_id })} to={`/user/${commentEdge.node.user.raw_id}`}>
                       <span className="font-weight-bold">{commentEdge.node.user.name}</span>
                     </Link>
                     <span>{commentEdge.node.message}</span>
@@ -47,10 +47,10 @@ class PostCommentDetail extends PureComponent {
               {/* for reply comment */}
               {commentEdge.node.replies && commentEdge.node.replies.edges &&
                 commentEdge.node.replies.edges.map(replyEdge => (
-                  <div className="reply-comment ml-3 ml-md-5" key={replyEdge.node._id}>
+                  <div className="reply-comment ml-3 ml-md-5" key={replyEdge.node.raw_id}>
                     <div className="row mb-2">
                       <div className="col-auto pr-0">
-                        <Link to={`/user/${replyEdge.node.user._id}`}>
+                        <Link to={`/user/${replyEdge.node.user.raw_id}`}>
                           <LazyImage
                             className="rounded-circle fb-avatar"
                             src={replyEdge.node.user.profile_pic}
@@ -62,7 +62,7 @@ class PostCommentDetail extends PureComponent {
                       </div>
                       <div className="col">
                         <span className="cmt-box reply-box brko">
-                          <Link className={classNames('mr-1', { 'redditvn-op': opId === replyEdge.node.user._id })} to={`/user/${replyEdge.node.user._id}`}>
+                          <Link className={classNames('mr-1', { 'redditvn-op': opId === replyEdge.node.user.raw_id })} to={`/user/${replyEdge.node.user.raw_id}`}>
                             <span className="font-weight-bold">{replyEdge.node.user.name}</span>
                           </Link>
                           <span>{replyEdge.node.message}</span>

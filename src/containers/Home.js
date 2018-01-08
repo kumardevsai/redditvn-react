@@ -45,7 +45,7 @@ class Home extends Component {
         fetchPolicy: 'network-only'
       });
       this.props.hideLoading();
-      this.props.push(`/post/${response.data.random._id}`);
+      this.props.push(`/post/${response.data.random.raw_id}`);
     } catch (error) {
       console.log('ERROR: random', error);
       this.props.hideLoading();
@@ -105,8 +105,8 @@ class Home extends Component {
               <ul className="dropdown-menu dropdown-menu-right dropdown-menu-subreddit">
                 {data.subreddits &&
                   data.subreddits.edges.map(value => (
-                    <li key={value.node._id} className="dropdown-item" data-value={value.node._id}>
-                      {value.node._id}
+                    <li key={value.node.raw_id} className="dropdown-item" data-value={value.node.raw_id}>
+                      {value.node.raw_id}
                     </li>
                   ))}
               </ul>

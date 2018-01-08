@@ -129,7 +129,7 @@ class Search extends Component {
                 />
               </div>
 
-              <div className="blog-main">{posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}</div>
+              <div className="blog-main">{posts.edges.map(value => <PostContainer key={value.node.raw_id} postId={value.node.raw_id} post={value.node} />)}</div>
 
               <div className="nav justify-content-end">
                 <Pagination

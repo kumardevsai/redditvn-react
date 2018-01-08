@@ -234,7 +234,7 @@ class User extends Component {
             </div>
             <div className="user-detail">
               <h3>
-                <a href={`https://www.facebook.com/${user._id}`}>{user.name}</a>
+                <a href={`https://www.facebook.com/${user.raw_id}`}>{user.name}</a>
               </h3>
             </div>
           </div>
@@ -274,7 +274,7 @@ class User extends Component {
                       onClickPreviousPage={this.onClickPreviousPagePost}
                     />
                   </div>
-                  {user.posts.edges.map(value => <PostContainer key={value.node._id} postId={value.node._id} post={value.node} />)}
+                  {user.posts.edges.map(value => <PostContainer key={value.node.raw_id} postId={value.node.raw_id} post={value.node} />)}
                   <div className="nav justify-content-end">
                     <Pagination
                       hasNextPage={user.posts.pageInfo.hasNextPage}

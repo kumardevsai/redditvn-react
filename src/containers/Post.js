@@ -38,7 +38,7 @@ class Post extends Component {
 
     return (
       <PostContainer
-        postId={data.post._id}
+        postId={data.post.raw_id}
         post={data.post}
         nextPost={prevPost}
         prevPost={nextPost}

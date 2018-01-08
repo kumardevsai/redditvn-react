@@ -4,7 +4,7 @@ export const getRandom = gql`
   query getRandom($q: String, $r: String) {
     random(filter: { q: $q, r: $r }) {
       id
-      _id
+      raw_id
     }
   }
 `;
@@ -17,7 +17,7 @@ export const getCount = gql`
     subreddits: subreddits(first: 50) {
       edges {
         node {
-          _id
+          raw_id
           posts_count
         }
       }
@@ -30,9 +30,9 @@ export const getPost = gql`
     post: node(id: $post_id) {
       id
       ... on Post {
-        _id
+        raw_id
         user {
-          _id
+          raw_id
           name
           profile_pic
         }
@@ -57,14 +57,16 @@ export const getPost = gql`
     nextPost: posts(first: 1, after: $cursor) {
       edges {
         node {
-          _id
+          id
+          raw_id
         }
       }
     }
     prevPost: posts(last: 1, before: $cursor) {
       edges {
         node {
-          _id
+          id
+          raw_id
         }
       }
     }
@@ -76,7 +78,7 @@ export const getComments = gql`
     node(id: $post_id) {
       id
       ... on Post {
-        _id
+        raw_id
         comments(first: 20, after: $cursor) {
           pageInfo {
             hasNextPage
@@ -86,22 +88,22 @@ export const getComments = gql`
           edges {
             cursor
             node {
-              _id
+              raw_id
               message
               created_time
               user {
-                _id
+                raw_id
                 name
                 profile_pic
               }
               replies {
                 edges {
                   node {
-                    _id
+                    raw_id
                     message
                     created_time
                     user {
-                      _id
+                      raw_id
                       name
                       profile_pic
                     }
@@ -138,9 +140,9 @@ export const getPosts = gql`
       edges {
         cursor
         node {
-          _id
+          raw_id
           user {
-            _id
+            raw_id
             name
             profile_pic
           }
@@ -179,9 +181,9 @@ export const getPostsWithSubReddit = gql`
       edges {
         cursor
         node {
-          _id
+          raw_id
           user {
-            _id
+            raw_id
             name
             profile_pic
           }
@@ -203,9 +205,9 @@ export const getTop = gql`
     likes: posts(orderBy: likes_count_DESC, first: $first, filter: { since: $since, until: $until }) {
       edges {
         node {
-          _id
+          raw_id
           user {
-            _id
+            raw_id
             name
             profile_pic
           }
@@ -217,9 +219,9 @@ export const getTop = gql`
     comments: posts(orderBy: comments_count_DESC, first: $first, filter: { since: $since, until: $until }) {
       edges {
         node {
-          _id
+          raw_id
           user {
-            _id
+            raw_id
             name
             profile_pic
           }
@@ -232,7 +234,7 @@ export const getTop = gql`
       posts_count(first: $first, since: $since, until: $until) {
         edges {
           node {
-            _id
+            raw_id
             name
             profile_pic
             posts_count
@@ -252,7 +254,7 @@ export const getUser = gql`
     user: node(id: $node_id) {
       id
       ... on User {
-        _id
+        raw_id
         name
         profile_pic(size: 128)
         posts_count
@@ -268,9 +270,9 @@ export const getUser = gql`
           edges {
             cursor
             node {
-              _id
+              raw_id
               user {
-                _id
+                raw_id
                 name
                 profile_pic
               }
@@ -295,9 +297,9 @@ export const getUser = gql`
           edges {
             cursor
             node {
-              _id
+              raw_id
               user {
-                _id
+                raw_id
                 name
                 profile_pic
               }
@@ -316,7 +318,7 @@ export const getUserPosts = gql`
     user: node(id: $node_id) {
       id
       ... on User {
-        _id
+        raw_id
         posts(first: $post_first, after: $post_after, last: $post_last, before: $post_before, filter: { q: $query, user: $user_id }) {
           pageInfo {
             hasNextPage
@@ -328,9 +330,9 @@ export const getUserPosts = gql`
           edges {
             cursor
             node {
-              _id
+              raw_id
               user {
-                _id
+                raw_id
                 name
                 profile_pic
               }
@@ -355,7 +357,7 @@ export const getUserComments = gql`
     user: node(id: $node_id) {
       id
       ... on User {
-        _id
+        raw_id
         comments(first: $comment_first, after: $comment_after, last: $comment_last, before: $comment_before, filter: { q: $query, user: $user_id }) {
           pageInfo {
             hasNextPage
@@ -367,9 +369,9 @@ export const getUserComments = gql`
           edges {
             cursor
             node {
-              _id
+              raw_id
               user {
-                _id
+                raw_id
                 name
                 profile_pic
               }
@@ -405,9 +407,9 @@ export const getPostsWithUserReddit = gql`
       edges {
         cursor
         node {
-          _id
+          raw_id
           user {
-            _id
+            raw_id
             name
             profile_pic
           }
@@ -437,7 +439,7 @@ export const getUsers = gql`
       edges {
         cursor
         node {
-          _id
+          raw_id
           name
           profile_pic
           posts_count

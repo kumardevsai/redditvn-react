@@ -173,9 +173,9 @@ class Top extends Component {
               <ul className="list-group list-group-flush">
                 {posts_count &&
                   posts_count.edges.map(value => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node._id}>
+                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node.raw_id}>
                       <div>
-                        <Link to={`/user/${value.node._id}`} className="d-inline-block mr-2">
+                        <Link to={`/user/${value.node.raw_id}`} className="d-inline-block mr-2">
                           <LazyImage
                             className="mr-2 rounded-circle fb-avatar"
                             src={value.node.profile_pic}
@@ -184,9 +184,9 @@ class Top extends Component {
                             width="1.5rem"
                           />
                         </Link>
-                        <Link to={`/user/${value.node._id}`}>{value.node.name}</Link>
+                        <Link to={`/user/${value.node.raw_id}`}>{value.node.name}</Link>
                       </div>
-                      <Link className="badge badge-primary badge-pill" to={`/user/${value.node._id}`}>
+                      <Link className="badge badge-primary badge-pill" to={`/user/${value.node.raw_id}`}>
                         {value.node.posts_count}
                       </Link>
                     </li>
@@ -200,9 +200,9 @@ class Top extends Component {
               <ul className="list-group list-group-flush">
                 {likes &&
                   likes.edges.map(value => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node._id}>
+                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node.raw_id}>
                       <div>
-                        <Link to={`/user/${value.node.user._id}`} className="d-inline-block mr-2">
+                        <Link to={`/user/${value.node.user.raw_id}`} className="d-inline-block mr-2">
                           <LazyImage
                             className="rounded-circle fb-avatar"
                             src={value.node.user.profile_pic}
@@ -211,9 +211,9 @@ class Top extends Component {
                             width="1.5rem"
                           />
                         </Link>
-                        <Link to={`/post/${value.node._id}`}>{value.node.user.name}</Link>
+                        <Link to={`/post/${value.node.raw_id}`}>{value.node.user.name}</Link>
                       </div>
-                      <Link className="badge badge-primary badge-pill" to={`/post/${value.node._id}`}>
+                      <Link className="badge badge-primary badge-pill" to={`/post/${value.node.raw_id}`}>
                         {value.node.likes_count}
                       </Link>
                     </li>
@@ -227,9 +227,9 @@ class Top extends Component {
               <ul className="list-group list-group-flush">
                 {comments &&
                   comments.edges.map(value => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node._id}>
+                    <li className="list-group-item d-flex justify-content-between align-items-center" key={value.node.raw_id}>
                       <div>
-                        <Link to={`/user/${value.node.user._id}`} className="d-inline-block mr-2">
+                        <Link to={`/user/${value.node.user.raw_id}`} className="d-inline-block mr-2">
                           <LazyImage
                             className="mr-2 rounded-circle fb-avatar"
                             src={value.node.user.profile_pic}
@@ -238,9 +238,9 @@ class Top extends Component {
                             width="1.5rem"
                           />
                         </Link>
-                        <Link to={`/post/${value.node._id}`}>{value.node.user.name}</Link>
+                        <Link to={`/post/${value.node.raw_id}`}>{value.node.user.name}</Link>
                       </div>
-                      <Link className="badge badge-primary badge-pill" to={`/post/${value.node._id}`}>
+                      <Link className="badge badge-primary badge-pill" to={`/post/${value.node.raw_id}`}>
                         {value.node.comments_count}
                       </Link>
                     </li>

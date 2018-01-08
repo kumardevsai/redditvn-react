@@ -21,13 +21,13 @@ class PostAuthor extends PureComponent {
       <header className="card-header card-header-post">
         <div className="row">
           <div className="col-auto align-self-center pr-0">
-            <Link to={`/user/${user._id}`} className="d-inline-block">
+            <Link to={`/user/${user.raw_id}`} className="d-inline-block">
               <LazyImage className="rounded-circle fb-avatar" src={user.profile_pic} alt={user.name} height="2.5rem" width="2.5rem" />
             </Link>
           </div>
           <div className="col">
             <div className="user-name">
-              <Link to={`/user/${user._id}`}>
+              <Link to={`/user/${user.raw_id}`}>
                 <b>{user.name}</b>
               </Link>
             </div>
